@@ -3,6 +3,11 @@ package geometry;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+
 public class Donut extends Circle {
 	private int innerRadius;
 

@@ -17,6 +17,8 @@ import geometry.Shape;
 
 import java.awt.FlowLayout;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.JToggleButton;
@@ -44,6 +46,11 @@ public class FrmDrawing extends JFrame {
 	private JToggleButton btnSelect;
 	private JToolBar toolBar;
 	private Component verticalStrut_2;
+	private JButton btnBorderColor;
+	private JButton btnInnerColor;
+	private Component verticalStrut;
+	private Color borderColor;
+	private Color innerColor;
 
 	/**
 	 * Launch the application.
@@ -67,7 +74,7 @@ public class FrmDrawing extends JFrame {
 	public FrmDrawing() {
 		setTitle("Stanimirovic Bozana IT 32/2021 ");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 690, 400);
+		setBounds(100, 100, 772, 472);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(255, 182, 193));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -116,6 +123,29 @@ public class FrmDrawing extends JFrame {
 		toolBar.add(tglBtnDonut);
 		tglBtnDonut.setFocusPainted(false);
 		buttonGroup.add(tglBtnDonut);
+
+		verticalStrut = Box.createVerticalStrut(20);
+		toolBar.add(verticalStrut);
+
+		btnBorderColor = new JButton("Border color");
+		btnBorderColor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				borderColor = JColorChooser.showDialog(btnBorderColor, "Select color", borderColor);
+				btnBorderColor.setBackground(borderColor);
+			}
+		});
+		btnBorderColor.setFocusPainted(false);
+		toolBar.add(btnBorderColor);
+
+		btnInnerColor = new JButton("Inner color");
+		btnInnerColor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				innerColor = JColorChooser.showDialog(btnInnerColor, "Select color", innerColor);
+				btnInnerColor.setBackground(innerColor);
+			}
+		});
+		btnInnerColor.setFocusPainted(false);
+		toolBar.add(btnInnerColor);
 
 		verticalStrut_2 = Box.createVerticalStrut(20);
 		toolBar.add(verticalStrut_2);

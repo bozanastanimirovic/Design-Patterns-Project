@@ -45,6 +45,7 @@ public class DlgCircle extends JDialog {
 		try {
 			DlgCircle dialog = new DlgCircle();
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setLocationRelativeTo(null);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -47,6 +47,11 @@ public class Point extends Shape {
 
 	//
 
+	public Point(int x, int y, Color color) {
+		this(x, y);
+		setColor(color);
+	}
+
 	public boolean equals(Object obj) {
 		if (obj instanceof Point) {
 			Point pomocna = (Point) obj;

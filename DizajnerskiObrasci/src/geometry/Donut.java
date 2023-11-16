@@ -39,6 +39,12 @@ public class Donut extends Circle {
 		this(center, radius, innerRadius, selected, color);
 		setInnerColor(innerColor);
 	}
+	
+	public Donut(Point center, int radius, int innerRadius, Color color, Color innerColor) {
+		this(center, radius, innerRadius);
+		setColor(color);
+		setInnerColor(innerColor);
+	}
 
 	public boolean equals(Object obj) {
 		if (obj instanceof Donut) {

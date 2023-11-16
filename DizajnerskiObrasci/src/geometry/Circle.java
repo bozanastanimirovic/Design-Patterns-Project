@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Circle extends ShapeArea {
-	private Point center;
+	private Point center = new Point();
 	protected int radius;
 
 	public Circle() {
@@ -29,6 +29,12 @@ public class Circle extends ShapeArea {
 
 	public Circle(Point center, int radius, boolean selected, Color color, Color innerColor) {
 		this(center, radius, selected, color);
+		setInnerColor(innerColor);
+	}
+	
+	public Circle(Point center, int radius, Color color, Color innerColor) {
+		this(center, radius);
+		setColor(color);
 		setInnerColor(innerColor);
 	}
 

@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Rectangle extends ShapeArea {
-	private Point upperLeftPoint;
+	private Point upperLeftPoint = new Point();
 	private int width;
 	private int height;
 
@@ -30,6 +30,12 @@ public class Rectangle extends ShapeArea {
 
 	public Rectangle(Point upperLeftPoint, int height, int width, boolean selected, Color color, Color innerColor) {
 		this(upperLeftPoint, height, width, selected, color);
+		setInnerColor(innerColor);
+	}
+	
+	public Rectangle(Point upperLeftPoint, int height, int width, Color color, Color innerColor) {
+		this(upperLeftPoint, height, width);
+		setColor(color);
 		setInnerColor(innerColor);
 	}
 

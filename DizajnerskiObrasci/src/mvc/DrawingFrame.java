@@ -38,6 +38,9 @@ public class DrawingFrame extends JFrame {
 
 	DrawingView view = new DrawingView();
 	DrawingController controller;
+	private JToolBar toolBar_1;
+	private JButton btnUndo;
+	private JButton btnRedo;
 
 	public DrawingFrame() {
 		view.addMouseListener(new MouseAdapter() {
@@ -59,6 +62,27 @@ public class DrawingFrame extends JFrame {
 		view.setBorder(new EmptyBorder(5, 5, 5, 5));
 		view.setLayout(new BorderLayout(0, 0));
 		getContentPane().add(view, BorderLayout.CENTER);
+		
+		toolBar_1 = new JToolBar();
+		toolBar_1.setBackground(new Color(255, 182, 193));
+		view.add(toolBar_1, BorderLayout.SOUTH);
+		
+		btnUndo = new JButton("Undo");
+		btnUndo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		btnUndo.setBackground(new Color(255, 255, 255));
+		toolBar_1.add(btnUndo);
+		
+		btnRedo = new JButton("Redo");
+		btnRedo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnRedo.setBackground(new Color(255, 255, 255));
+		toolBar_1.add(btnRedo);
 
 		toolBar = new JToolBar();
 		toolBar.setBackground(new Color(255, 182, 193));

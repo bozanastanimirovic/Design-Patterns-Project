@@ -73,6 +73,19 @@ public class Line extends Shape {
 			g.setColor(Color.black);
 		}
 	}
+	
+	public Line clone() {
+		Line line = new Line();
+
+		line.getStartPoint().setX(this.getStartPoint().getX());
+		line.getStartPoint().setY(this.getStartPoint().getY());
+
+		line.getEndPoint().setX(this.getEndPoint().getX());
+		line.getEndPoint().setY(this.getEndPoint().getY());
+		line.setColor(this.getColor());
+
+		return line;
+	}
 
 	@Override
 	public void moveTo(int x, int y) {

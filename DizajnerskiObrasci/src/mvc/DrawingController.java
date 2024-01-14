@@ -2,12 +2,24 @@ package mvc;
 
 import java.awt.Color;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
 
 import javax.swing.JOptionPane;
 
+import adapter.HexagonAdapter;
+import command.AddShapeCmd;
+import command.RemoveShapeCmd;
+import command.UpdateCircleCmd;
+import command.UpdateDonutCmd;
+import command.UpdateLineCmd;
+import command.UpdatePointCmd;
+import command.UpdateRectangleCmd;
 import drawing.DlgCircle;
 import drawing.DlgDonut;
+import drawing.DlgHexagon;
 import drawing.DlgLine;
 import drawing.DlgPoint;
 import drawing.DlgRectangle;
@@ -25,6 +37,33 @@ public class DrawingController {
 	private Point upperLeftPoint;
 	private Point center;
 
+	private Stack<Shape> shapesUndo = new Stack<Shape>();
+	private Stack<Shape> shapesRedo = new Stack<Shape>();
+
+	/*private Stack<Shape> newShape = new Stack<Shape>();
+	private Stack<Shape> modifiedShape = new Stack<Shape>();
+	private Stack<Shape> oldShape = new Stack<Shape>();
+
+	private Stack<Shape> newShapeRedo = new Stack<Shape>();
+	private Stack<Shape> modifiedShapeRedo = new Stack<Shape>();
+	private Stack<Shape> oldShapeRedo = new Stack<Shape>();*/
+
+	private Stack<String> modifyShape = new Stack<String>();
+	private Stack<String> modifyShapeRedo = new Stack<String>();
+
+	private Stack<String> undoOp = new Stack<String>();
+	private Stack<String> redoOp = new Stack<String>();
+
+	AddShapeCmd addShapeCmd;
+	RemoveShapeCmd removeShapeCmd;
+	UpdatePointCmd updatePointCmd;
+	UpdateLineCmd updateLineCmd;
+	UpdateRectangleCmd updateRectangleCmd;
+	UpdateCircleCmd updateCircleCmd;
+	UpdateDonutCmd updateDonutCmd;
+
+	List<Shape> selectedShapes = new ArrayList<>();
+
 	DrawingModel model;
 	DrawingFrame frame;
 
@@ -36,7 +75,7 @@ public class DrawingController {
 	public void mouseClicked(MouseEvent e) {
 		Shape newShape = null;
 		if (frame.getBtnSelect().isSelected()) {
-			selected = null;
+			// selected = null;
 			Iterator<Shape> it = model.getShapes().iterator();
 
 			while (it.hasNext()) {
@@ -55,6 +94,15 @@ public class DrawingController {
 				 * } if (selected != null) { selected.setSelected(true); }
 				 */
 
+				/*
+				 * Shape shape = it.next(); if (shape.contains(e.getX(), e.getY())) { if
+				 * (!selectedShapes.contains(shape)) { selectedShapes.add(shape); }
+				 * shape.setSelected(true); } else { shape.setSelected(false); }
+				 * 
+				 * for (int i = 0; i < selectedShapes.size(); i++) {
+				 * frame.getView().setSelected(shape); }
+				 */
+
 				Shape shape = it.next();
 				if (shape.contains(e.getX(), e.getY())) {
 					shape.setSelected(true);
@@ -63,9 +111,10 @@ public class DrawingController {
 				} else {
 					shape.setSelected(false);
 				}
+
 			}
 
-			frame.getView().repaint();
+			frame.repaint();
 
 		} else if (frame.getTglBtnPoint().isSelected()) {
 			DlgPoint dlgPoint = new DlgPoint();
@@ -73,6 +122,7 @@ public class DrawingController {
 			dlgPoint.getTxtXCoordinate().setEditable(false);
 			dlgPoint.getTxtYCoordinate().setText(String.valueOf(e.getY()));
 			dlgPoint.getTxtYCoordinate().setEditable(false);
+			dlgPoint.setBackground(frame.getBorderColor());
 			dlgPoint.setModal(true);
 			dlgPoint.setVisible(true);
 			newShape = new Point(e.getX(), e.getY(), false, dlgPoint.getBtnColor().getBackground());
@@ -144,22 +194,47 @@ public class DrawingController {
 				return;
 			newShape = dlgDonut.getDonut();
 			startPoint = null;
+		} else if (frame.getTglBtnHexagon().isSelected()) {
+			DlgHexagon dlgHexagon = new DlgHexagon();
+			upperLeftPoint = new Point(e.getX(), e.getY());
+			dlgHexagon.setHexagon(new HexagonAdapter(upperLeftPoint, -1, false,
+					dlgHexagon.getBtnBorderColor().getBackground(), dlgHexagon.getBtnInnerColor().getBackground()));
+
+			dlgHexagon.getTxtXCoordinate().setText(String.valueOf(upperLeftPoint.getX()));
+			dlgHexagon.getTxtXCoordinate().setEditable(false);
+			dlgHexagon.getTxtYCoordinate().setText(String.valueOf(upperLeftPoint.getY()));
+			dlgHexagon.getTxtYCoordinate().setEditable(false);
+			dlgHexagon.setModal(true);
+			dlgHexagon.setVisible(true);
+			if (!dlgHexagon.isOk())
+				return;
+			newShape = dlgHexagon.getHexagon();
+			startPoint = null;
 		}
 
 		if (newShape != null)
 
 		{
-			model.getShapes().add(newShape);
+			// model.getShapes().add(newShape);
+			shapesUndo.push(newShape);
+			addShapeCmd = new AddShapeCmd(newShape, model);
+			addShapeCmd.execute();
+			// operation = "add";
+			undoOp.push("add");
+			/*
+			 * System.out.println(undoOp); System.out.println(shapesUndo.peek());
+			 * System.out.println(model.getShapes());
+			 */
 		}
 
 		frame.repaint();
-
 	}
 
-	public void modify() {
+	public void modify() throws Exception {
 		Shape selected = frame.getView().getSelected();
 		if (selected != null) {
 			if (selected instanceof Point) {
+
 				Point point = (Point) selected;
 				DlgPoint dlgPoint = new DlgPoint();
 				dlgPoint.setPoint(point);
@@ -169,10 +244,48 @@ public class DrawingController {
 				dlgPoint.getBtnColor().setBackground(point.getColor());
 				dlgPoint.setVisible(true);
 				if (dlgPoint.isOk()) {
-					frame.getView().getModel().getShapes().remove(selected);
-					frame.getView().getModel().getShapes().add(dlgPoint.getPoint());
+					/*
+					 * shapesUndo.push(point); updatePointCmd = new UpdatePointCmd(point,
+					 * dlgPoint.getPoint()); updatePointCmd.execute(); undoOp.push("modify");
+					 * System.out.println(undoOp); System.out.println(shapesUndo.peek());
+					 * System.out.println(model.getShapes()); //
+					 * frame.getView().getModel().getShapes().remove(selected); //
+					 * frame.getView().getModel().getShapes().add(dlgPoint.getPoint());
+					 * frame.repaint();
+					 */
+					/*
+					 * shapesUndo.push(point.clone()); modifyList.add(point.clone()); Point newPoint
+					 * = dlgPoint.getPoint(); newShapes.push(newPoint);
+					 * 
+					 * updatePointCmd = new UpdatePointCmd(point, newPoint);
+					 * updatePointCmd.execute(); modified.push(point);
+					 * 
+					 * undoOp.push("modifyPoint");
+					 * 
+					 * System.out.println(undoOp); System.out.println(shapesUndo.peek());
+					 * System.out.println(newShapes.peek()); System.out.println(model.getShapes());
+					 * 
+					 * frame.repaint();
+					 */
+
+					undoOp.add("modify");
+					modifyShape.add("point");
+
+					// oldShape.add(point.clone());
+					Point newPoint = dlgPoint.getPoint();
+
+					updatePointCmd = new UpdatePointCmd((Point) selected, newPoint);
+					updatePointCmd.execute();
+
+					// modifiedShape.add(point);
+					// newShape.add(newPoint);
+					// modifiedShapeRedo.add(newPoint.clone());
+
+					// System.out.println(model.getShapes());
+
 					frame.repaint();
 				}
+				selected.setSelected(false);
 
 			} else if (selected instanceof Line) {
 				Line line = (Line) selected;
@@ -186,8 +299,15 @@ public class DrawingController {
 				dlgLine.getBtnColor().setBackground(line.getColor());
 				dlgLine.setVisible(true);
 				if (dlgLine.isOk()) {
-					frame.getView().getModel().getShapes().remove(selected);
-					frame.getView().getModel().getShapes().add(dlgLine.getLine());
+					
+					undoOp.add("modify");
+					modifyShape.add("line");
+
+					Line newLine = dlgLine.getLine();
+
+					updateLineCmd = new UpdateLineCmd((Line) selected, newLine);
+					updateLineCmd.execute();
+
 					frame.repaint();
 				}
 
@@ -204,8 +324,15 @@ public class DrawingController {
 				dlgRectangle.getBtnInnerColor().setBackground(rectangle.getInnerColor());
 				dlgRectangle.setVisible(true);
 				if (dlgRectangle.isOk()) {
-					frame.getView().getModel().getShapes().remove(selected);
-					frame.getView().getModel().getShapes().add(dlgRectangle.getRectangle());
+					
+					undoOp.add("modify");
+					modifyShape.add("rectangle");
+
+					Rectangle newRectangle = dlgRectangle.getRectangle();
+					
+					updateRectangleCmd = new UpdateRectangleCmd((Rectangle) selected, newRectangle);
+					updateRectangleCmd.execute();
+
 					frame.repaint();
 				}
 
@@ -221,8 +348,15 @@ public class DrawingController {
 				dlgCircle.getBtnInnerColor().setBackground(circle.getInnerColor());
 				dlgCircle.setVisible(true);
 				if (dlgCircle.isOk()) {
-					frame.getView().getModel().getShapes().remove(selected);
-					frame.getView().getModel().getShapes().add(dlgCircle.getCircle());
+					
+					undoOp.add("modify");
+					modifyShape.add("circle");
+
+					Circle newCircle = dlgCircle.getCircle();
+					
+					updateCircleCmd = new UpdateCircleCmd((Circle) selected, newCircle);
+					updateCircleCmd.execute();
+
 					frame.repaint();
 				}
 			} else if (selected instanceof Donut) {
@@ -238,8 +372,15 @@ public class DrawingController {
 				dlgDonut.getBtnInnerColor().setBackground(donut.getInnerColor());
 				dlgDonut.setVisible(true);
 				if (dlgDonut.isOk()) {
-					frame.getView().getModel().getShapes().remove(selected);
-					frame.getView().getModel().getShapes().add(dlgDonut.getDonut());
+					
+					undoOp.add("modify");
+					modifyShape.add("donut");
+
+					Donut newDonut = dlgDonut.getDonut();
+					
+					updateDonutCmd = new UpdateDonutCmd((Donut) selected, newDonut);
+					updateDonutCmd.execute();
+
 					frame.repaint();
 				}
 			}
@@ -253,7 +394,15 @@ public class DrawingController {
 			int selectedOpt = JOptionPane.showConfirmDialog(null, "Do you want to delete this shape?", "Message",
 					JOptionPane.YES_NO_OPTION);
 			if (selectedOpt == JOptionPane.YES_OPTION) {
-				frame.getView().getModel().getShapes().remove(selected);
+				// frame.getView().getModel().getShapes().remove(selected);
+				removeShapeCmd = new RemoveShapeCmd(selected, model);
+				removeShapeCmd.execute();
+				shapesUndo.push(selected);
+				// operation = "delete";
+				undoOp.push("delete");
+				System.out.println(undoOp);
+				System.out.println(shapesUndo.peek());
+				System.out.println(model.getShapes());
 			}
 		}
 		frame.getView().setSelected(null);
@@ -262,4 +411,172 @@ public class DrawingController {
 
 	}
 
+	public void undo() throws Exception {
+		if (undoOp.size() == 0) {
+			JOptionPane.showMessageDialog(null, "Niste izvrsili nijednu operaciju!", "Message",
+					JOptionPane.ERROR_MESSAGE);
+		} else if (undoOp.peek() == "add") {
+			if (model.getShapes().size() > 0) {
+				addShapeCmd = new AddShapeCmd(shapesUndo.peek(), model);
+				shapesRedo.push(shapesUndo.pop());
+				addShapeCmd.unexecute();
+				redoOp.push(undoOp.pop());
+
+			}
+		} else if (undoOp.peek() == "delete") {
+			removeShapeCmd = new RemoveShapeCmd(shapesUndo.peek(), model);
+			shapesRedo.push(shapesUndo.pop());
+			removeShapeCmd.unexecute();
+			redoOp.push(undoOp.pop());
+
+		} else if (undoOp.peek() == "modify") {
+			
+
+			// for (int i = 0; i < modifyList.size(); i++) {
+			if (modifyShape.peek() == "point") {
+				/*
+				 * System.out.println(undoOp); System.out.println(undoOp.peek());
+				 */
+
+				// modifiedShapeRedo.push(modifiedShape.peek());
+
+				/*
+				 * System.out.println(modifiedShape.peek());
+				 * System.out.println(oldShape.peek());
+				 */
+				// modifiedShapeRedo.push(modifiedShape.peek().clone());
+
+				// updatePointCmd = new UpdatePointCmd((Point) modifiedShape.pop(), (Point)
+				// oldShape.peek());
+				updatePointCmd.unexecute();
+
+				modifyShapeRedo.push(modifyShape.pop());
+				// oldShapeRedo.push(oldShape.pop());
+				// modifiedShapeRedo.push(modifiedShape.pop());
+				redoOp.push(undoOp.pop());
+
+				/*
+				 * System.out.println(undoOp); System.out.println(modifiedShapeRedo.peek());
+				 * System.out.println(oldShapeRedo.peek());
+				 * System.out.println(model.getShapes()); System.out.println(undoOp.peek());
+				 */
+			} else if (modifyShape.peek() == "line") {
+
+				updateLineCmd.unexecute();
+
+				modifyShapeRedo.push(modifyShape.pop());
+				redoOp.push(undoOp.pop());
+			} else if (modifyShape.peek() == "rectangle") {
+
+				updateRectangleCmd.unexecute();
+
+				modifyShapeRedo.push(modifyShape.pop());
+				redoOp.push(undoOp.pop());
+			} else if (modifyShape.peek() == "circle") {
+
+				updateCircleCmd.unexecute();
+
+				modifyShapeRedo.push(modifyShape.pop());
+				redoOp.push(undoOp.pop());
+			} else if (modifyShape.peek() == "donut") {
+
+				updateDonutCmd.unexecute();
+
+				modifyShapeRedo.push(modifyShape.pop());
+				redoOp.push(undoOp.pop());
+			}
+		}
+		frame.repaint();
+	}
+
+	public void redo() throws Exception {
+		if (redoOp.size() == 0) {
+			JOptionPane.showMessageDialog(null, "Niste izvrsili nijednu operaciju!", "Message",
+					JOptionPane.ERROR_MESSAGE);
+		} else if (redoOp.peek() == "add") {
+			addShapeCmd = new AddShapeCmd(shapesRedo.peek(), model);
+			System.out.println(shapesRedo.peek());
+			System.out.println(shapesRedo);
+			System.out.println(redoOp);
+			System.out.println(model.getShapes());
+			shapesUndo.push(shapesRedo.pop());
+			addShapeCmd.execute();
+			undoOp.push(redoOp.pop());
+			// shapesUndo.pop();
+			// frame.getView().getModel().getShapes().remove(shapesUndo.pop());
+
+		} else if (redoOp.peek() == "delete") {
+			removeShapeCmd = new RemoveShapeCmd(shapesRedo.peek(), model);
+			System.out.println(shapesRedo.peek());
+			System.out.println(shapesRedo);
+			System.out.println(redoOp);
+			System.out.println(model.getShapes());
+			shapesUndo.push(shapesRedo.pop());
+			removeShapeCmd.execute();
+			undoOp.push(redoOp.pop());
+			// shapesUndo.pop();
+			// frame.getView().getModel().getShapes().remove(shapesUndo.pop());
+
+		} else if (redoOp.peek() == "modify") {
+			if (modifyShapeRedo.peek() == "point") {
+				/*
+				 * updatePointCmd = new UpdatePointCmd((Point) modifyList.get(i), (Point)
+				 * newShapes.peek());
+				 * 
+				 * shapesRedo.push(shapesUndo.pop()); newShapesRedo.push(newShapes.pop());
+				 * modified.peek();
+				 * 
+				 * updatePointCmd.unexecute();
+				 * 
+				 * redoOp.push(undoOp.pop());
+				 */
+				/*
+				 * System.out.println(modifiedShapeRedo.peek());
+				 * System.out.println(oldShapeRedo.peek());
+				 * System.out.println(model.getShapes());
+				 * 
+				 * oldShape.push(oldShapeRedo.peek().clone());
+				 */
+
+				// updatePointCmd = new UpdatePointCmd((Point) oldShapeRedo.pop(), (Point)
+				// modifiedShapeRedo.peek());
+				updatePointCmd.execute();
+
+				modifyShape.push(modifyShapeRedo.pop());
+				// modifiedShape.push(modifiedShapeRedo.pop());
+				undoOp.push(redoOp.pop());
+
+				/*
+				 * System.out.println(modifiedShapeRedo.peek());
+				 * System.out.println(oldShapeRedo.peek());
+				 * System.out.println(model.getShapes());
+				 */
+			} else if (modifyShapeRedo.peek() == "line") {
+
+				updateLineCmd.execute();
+
+				modifyShape.push(modifyShapeRedo.pop());
+				undoOp.push(redoOp.pop());
+			} else if (modifyShapeRedo.peek() == "rectangle") {
+
+				updateRectangleCmd.execute();
+
+				modifyShape.push(modifyShapeRedo.pop());
+				undoOp.push(redoOp.pop());
+			} else if (modifyShapeRedo.peek() == "circle") {
+
+				updateCircleCmd.execute();
+
+				modifyShape.push(modifyShapeRedo.pop());
+				undoOp.push(redoOp.pop());
+			} else if (modifyShapeRedo.peek() == "donut") {
+
+				updateDonutCmd.execute();
+
+				modifyShape.push(modifyShapeRedo.pop());
+				undoOp.push(redoOp.pop());
+			}
+		}
+		frame.repaint();
+	}
 }

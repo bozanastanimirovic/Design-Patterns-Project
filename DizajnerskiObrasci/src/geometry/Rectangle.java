@@ -87,6 +87,22 @@ public class Rectangle extends ShapeArea {
 			g.setColor(Color.black);
 		}
 	}
+	
+	public Rectangle clone() {
+		Rectangle rectangle = new Rectangle();
+		
+		rectangle.getUpperLeftPoint().setX(this.getUpperLeftPoint().getX());
+		rectangle.getUpperLeftPoint().setY(this.getUpperLeftPoint().getY());
+
+		rectangle.setHeight(this.getHeight());
+		rectangle.setWidth(this.getWidth());
+		
+		rectangle.setColor(this.getColor());
+		rectangle.setInnerColor(this.getInnerColor());
+
+		return rectangle;
+	}
+
 
 	@Override
 	public void moveTo(int x, int y) {

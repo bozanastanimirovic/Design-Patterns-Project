@@ -33,14 +33,15 @@ public class DrawingFrame extends JFrame {
 	private JButton btnBorderColor;
 	private JButton btnInnerColor;
 	private Component verticalStrut;
-	private Color borderColor;
-	private Color innerColor;
+	private Color borderColor = Color.BLACK;
+	private Color innerColor = Color.WHITE;
 
 	DrawingView view = new DrawingView();
 	DrawingController controller;
 	private JToolBar toolBar_1;
 	private JButton btnUndo;
 	private JButton btnRedo;
+	private JToggleButton tglbtnHexagon;
 
 	public DrawingFrame() {
 		view.addMouseListener(new MouseAdapter() {
@@ -69,8 +70,13 @@ public class DrawingFrame extends JFrame {
 		
 		btnUndo = new JButton("Undo");
 		btnUndo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
+			public void actionPerformed(ActionEvent e){
+				try {
+					controller.undo();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		btnUndo.setBackground(new Color(255, 255, 255));
@@ -79,6 +85,12 @@ public class DrawingFrame extends JFrame {
 		btnRedo = new JButton("Redo");
 		btnRedo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				try {
+					controller.redo();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		btnRedo.setBackground(new Color(255, 255, 255));
@@ -122,11 +134,19 @@ public class DrawingFrame extends JFrame {
 		toolBar.add(tglBtnDonut);
 		tglBtnDonut.setFocusPainted(false);
 		buttonGroup.add(tglBtnDonut);
+		
+		tglbtnHexagon = new JToggleButton("HEXAGON");
+		tglbtnHexagon.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
+		tglbtnHexagon.setBackground(new Color(255, 255, 255));
+		toolBar.add(tglbtnHexagon);
+		tglbtnHexagon.setFocusPainted(false);
+		buttonGroup.add(tglbtnHexagon);
 
 		verticalStrut = Box.createVerticalStrut(20);
 		toolBar.add(verticalStrut);
 
 		btnBorderColor = new JButton("Border color");
+		btnBorderColor.setBackground(borderColor);
 		btnBorderColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				borderColor = JColorChooser.showDialog(btnBorderColor, "Select color", borderColor);
@@ -137,6 +157,7 @@ public class DrawingFrame extends JFrame {
 		toolBar.add(btnBorderColor);
 
 		btnInnerColor = new JButton("Inner color");
+		btnInnerColor.setBackground(innerColor);
 		btnInnerColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				innerColor = JColorChooser.showDialog(btnInnerColor, "Select color", innerColor);
@@ -185,7 +206,12 @@ public class DrawingFrame extends JFrame {
 					btnSelect.setSelected(true);
 
 				} else {
-					controller.modify();
+					try {
+						controller.modify();
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					view.getSelected().setSelected(false);
 					view.setSelected(null);
 					btnSelect.setSelected(false);
@@ -243,6 +269,14 @@ public class DrawingFrame extends JFrame {
 
 	public void setTglBtnDonut(JToggleButton tglBtnDonut) {
 		this.tglBtnDonut = tglBtnDonut;
+	}
+
+	public JToggleButton getTglBtnHexagon() {
+		return tglbtnHexagon;
+	}
+
+	public void setTglBtnHexagon(JToggleButton tglbtnHexagon) {
+		this.tglbtnHexagon = tglbtnHexagon;
 	}
 
 	public JToggleButton getBtnSelect() {

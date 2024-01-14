@@ -32,12 +32,11 @@ public class Point extends Shape {
 		this(x, y);
 		setSelected(selected);
 	}
-	
+
 	public Point(int x, int y, boolean selected, Color color) {
 		this(x, y, selected);
 		setColor(color);
 	}
-
 
 	// konstruktori mogu da se zovu isto ali da imaju razlicite parametre, ako
 	// imaju
@@ -111,6 +110,17 @@ public class Point extends Shape {
 			return (int) (this.distance(0, 0) - shapeToCompare.distance(0, 0));
 		}
 		return 0;
+	}
+	
+	public Point clone() {
+		Point point = new Point();
+
+		point.setX(this.getX());
+		point.setY(this.getY());
+		
+		point.setColor(this.getColor());
+
+		return point;
 	}
 
 	public void setX(int x) {

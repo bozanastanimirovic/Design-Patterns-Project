@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
@@ -62,10 +63,33 @@ public class Donut extends Circle {
 	}
 	
 	public void fill(Graphics g) {
-		g.setColor(getInnerColor());
-		super.fill(g);
-		g.setColor(Color.white);
-		g.fillOval(getCenter().getX() - this.innerRadius, getCenter().getY() - this.innerRadius, this.innerRadius * 2, this.innerRadius * 2);
+		Graphics2D g2D = (Graphics2D) g.create();
+		
+		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		
+		Shape outerCircle = new Ellipse2D.Double(getCenter().getX() - getRadius(), getCenter().getY() - getRadius(),
+                2 * getRadius(), 2 * getRadius());
+		
+		Shape innerCircle = new Ellipse2D.Double(getCenter().getX() - innerRadius, getCenter().getY() - innerRadius,
+                2 * innerRadius, 2 * innerRadius);
+		
+		Area donutArea = new Area(outerCircle);
+
+	        
+        donutArea.subtract(new Area(innerCircle));
+
+        g2D.setColor(getInnerColor());
+
+        g2D.fill(donutArea);
+
+        g2D.dispose();
+		
+		g2D.setColor(getInnerColor());
+		super.fill(g2D);
+		g2D.setColor(Color.white);
+		g2D.fillOval(getCenter().getX() - this.innerRadius, getCenter().getY() - this.innerRadius, this.innerRadius * 2, this.innerRadius * 2);
+		
 	}
 
 	public void draw(Graphics g) {
@@ -83,6 +107,27 @@ public class Donut extends Circle {
 			g.drawRect(getCenter().getX() - 2, getCenter().getY() + innerRadius - 2, 4, 4);
 			g.setColor(Color.black);
 		}
+	}
+	
+	public Donut clone() {
+		Donut donut = new Donut();
+		
+		donut.getCenter().setX(this.getCenter().getX());
+		donut.getCenter().setY(this.getCenter().getY());
+
+		try {
+			donut.setRadius(this.getRadius());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		donut.setInnerRadius(this.getInnerRadius());
+		
+		donut.setColor(this.getColor());
+		donut.setInnerColor(this.getInnerColor());
+
+		return donut;
 	}
 
 	@Override

@@ -38,6 +38,11 @@ public class Circle extends ShapeArea {
 		setInnerColor(innerColor);
 	}
 
+	public Circle(Point center, int radius, Color color) {
+		this(center, radius);
+		setColor(color);
+	}
+
 	public boolean equals(Object obj) {
 		if (obj instanceof Circle) {
 			Circle pomocna = (Circle) obj;
@@ -86,6 +91,25 @@ public class Circle extends ShapeArea {
 			g.drawRect(getCenter().getX() - 2, getCenter().getY() + radius - 2, 4, 4);
 			g.setColor(Color.black);
 		}
+	}
+	
+	public Circle clone() {
+		Circle circle = new Circle();
+		
+		circle.getCenter().setX(this.getCenter().getX());
+		circle.getCenter().setY(this.getCenter().getY());
+
+		try {
+			circle.setRadius(this.getRadius());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		circle.setColor(this.getColor());
+		circle.setInnerColor(this.getInnerColor());
+
+		return circle;
 	}
 
 	@Override

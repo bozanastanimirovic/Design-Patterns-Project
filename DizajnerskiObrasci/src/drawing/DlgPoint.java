@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import geometry.Point;
+import mvc.DrawingFrame;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -121,6 +122,7 @@ public class DlgPoint extends JDialog {
 			{
 				btnColor = new JButton("Color");
 				btnColor.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 11));
+				// btnColor.setBackground(frame.getBorderColor());
 				btnColor.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						Color color = JColorChooser.showDialog(null, "Choose border color",

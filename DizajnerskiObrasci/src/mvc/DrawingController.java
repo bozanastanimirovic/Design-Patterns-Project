@@ -14,6 +14,7 @@ import command.AddShapeCmd;
 import command.RemoveShapeCmd;
 import command.UpdateCircleCmd;
 import command.UpdateDonutCmd;
+import command.UpdateHexagonCmd;
 import command.UpdateLineCmd;
 import command.UpdatePointCmd;
 import command.UpdateRectangleCmd;
@@ -40,13 +41,15 @@ public class DrawingController {
 	private Stack<Shape> shapesUndo = new Stack<Shape>();
 	private Stack<Shape> shapesRedo = new Stack<Shape>();
 
-	/*private Stack<Shape> newShape = new Stack<Shape>();
-	private Stack<Shape> modifiedShape = new Stack<Shape>();
-	private Stack<Shape> oldShape = new Stack<Shape>();
-
-	private Stack<Shape> newShapeRedo = new Stack<Shape>();
-	private Stack<Shape> modifiedShapeRedo = new Stack<Shape>();
-	private Stack<Shape> oldShapeRedo = new Stack<Shape>();*/
+	/*
+	 * private Stack<Shape> newShape = new Stack<Shape>(); private Stack<Shape>
+	 * modifiedShape = new Stack<Shape>(); private Stack<Shape> oldShape = new
+	 * Stack<Shape>();
+	 * 
+	 * private Stack<Shape> newShapeRedo = new Stack<Shape>(); private Stack<Shape>
+	 * modifiedShapeRedo = new Stack<Shape>(); private Stack<Shape> oldShapeRedo =
+	 * new Stack<Shape>();
+	 */
 
 	private Stack<String> modifyShape = new Stack<String>();
 	private Stack<String> modifyShapeRedo = new Stack<String>();
@@ -61,6 +64,7 @@ public class DrawingController {
 	UpdateRectangleCmd updateRectangleCmd;
 	UpdateCircleCmd updateCircleCmd;
 	UpdateDonutCmd updateDonutCmd;
+	UpdateHexagonCmd updateHexagonCmd;
 
 	List<Shape> selectedShapes = new ArrayList<>();
 
@@ -196,25 +200,27 @@ public class DrawingController {
 			startPoint = null;
 		} else if (frame.getTglBtnHexagon().isSelected()) {
 			DlgHexagon dlgHexagon = new DlgHexagon();
-			upperLeftPoint = new Point(e.getX(), e.getY());
-			dlgHexagon.setHexagon(new HexagonAdapter(upperLeftPoint, -1, false,
-					dlgHexagon.getBtnBorderColor().getBackground(), dlgHexagon.getBtnInnerColor().getBackground()));
+			center = new Point(e.getX(), e.getY());
+			dlgHexagon.setHexagon(new HexagonAdapter(center, -1, false, dlgHexagon.getBtnBorderColor().getBackground(),
+					dlgHexagon.getBtnInnerColor().getBackground()));
 
-			dlgHexagon.getTxtXCoordinate().setText(String.valueOf(upperLeftPoint.getX()));
+			dlgHexagon.getTxtXCoordinate().setText(String.valueOf(center.getX()));
 			dlgHexagon.getTxtXCoordinate().setEditable(false);
-			dlgHexagon.getTxtYCoordinate().setText(String.valueOf(upperLeftPoint.getY()));
+			dlgHexagon.getTxtYCoordinate().setText(String.valueOf(center.getY()));
 			dlgHexagon.getTxtYCoordinate().setEditable(false);
 			dlgHexagon.setModal(true);
 			dlgHexagon.setVisible(true);
 			if (!dlgHexagon.isOk())
 				return;
 			newShape = dlgHexagon.getHexagon();
+			System.out.println(newShape);
 			startPoint = null;
 		}
 
 		if (newShape != null)
 
 		{
+			System.out.println(newShape);
 			// model.getShapes().add(newShape);
 			shapesUndo.push(newShape);
 			addShapeCmd = new AddShapeCmd(newShape, model);
@@ -299,7 +305,7 @@ public class DrawingController {
 				dlgLine.getBtnColor().setBackground(line.getColor());
 				dlgLine.setVisible(true);
 				if (dlgLine.isOk()) {
-					
+
 					undoOp.add("modify");
 					modifyShape.add("line");
 
@@ -324,12 +330,12 @@ public class DrawingController {
 				dlgRectangle.getBtnInnerColor().setBackground(rectangle.getInnerColor());
 				dlgRectangle.setVisible(true);
 				if (dlgRectangle.isOk()) {
-					
+
 					undoOp.add("modify");
 					modifyShape.add("rectangle");
 
 					Rectangle newRectangle = dlgRectangle.getRectangle();
-					
+
 					updateRectangleCmd = new UpdateRectangleCmd((Rectangle) selected, newRectangle);
 					updateRectangleCmd.execute();
 
@@ -348,12 +354,12 @@ public class DrawingController {
 				dlgCircle.getBtnInnerColor().setBackground(circle.getInnerColor());
 				dlgCircle.setVisible(true);
 				if (dlgCircle.isOk()) {
-					
+
 					undoOp.add("modify");
 					modifyShape.add("circle");
 
 					Circle newCircle = dlgCircle.getCircle();
-					
+
 					updateCircleCmd = new UpdateCircleCmd((Circle) selected, newCircle);
 					updateCircleCmd.execute();
 
@@ -372,14 +378,37 @@ public class DrawingController {
 				dlgDonut.getBtnInnerColor().setBackground(donut.getInnerColor());
 				dlgDonut.setVisible(true);
 				if (dlgDonut.isOk()) {
-					
+
 					undoOp.add("modify");
 					modifyShape.add("donut");
 
 					Donut newDonut = dlgDonut.getDonut();
-					
+
 					updateDonutCmd = new UpdateDonutCmd((Donut) selected, newDonut);
 					updateDonutCmd.execute();
+
+					frame.repaint();
+				}
+			} else if (selected instanceof HexagonAdapter) {
+				HexagonAdapter hexagon = (HexagonAdapter) selected;
+				DlgHexagon dlgHexagon = new DlgHexagon();
+				dlgHexagon.setHexagon(hexagon);
+				dlgHexagon.setModal(true);
+				dlgHexagon.getTxtXCoordinate().setText(String.valueOf(hexagon.getX()));
+				dlgHexagon.getTxtYCoordinate().setText(String.valueOf(hexagon.getY()));
+				dlgHexagon.getTxtR().setText(String.valueOf(hexagon.getR()));
+				dlgHexagon.getBtnBorderColor().setBackground(hexagon.getColor());
+				dlgHexagon.getBtnInnerColor().setBackground(hexagon.getInnerColor());
+				dlgHexagon.setVisible(true);
+				if (dlgHexagon.isOk()) {
+
+					undoOp.add("modify");
+					modifyShape.add("hexagon");
+
+					HexagonAdapter newHexagon = dlgHexagon.getHexagon();
+
+					updateHexagonCmd = new UpdateHexagonCmd((HexagonAdapter) selected, newHexagon);
+					updateHexagonCmd.execute();
 
 					frame.repaint();
 				}
@@ -430,7 +459,6 @@ public class DrawingController {
 			redoOp.push(undoOp.pop());
 
 		} else if (undoOp.peek() == "modify") {
-			
 
 			// for (int i = 0; i < modifyList.size(); i++) {
 			if (modifyShape.peek() == "point") {
@@ -481,6 +509,12 @@ public class DrawingController {
 			} else if (modifyShape.peek() == "donut") {
 
 				updateDonutCmd.unexecute();
+
+				modifyShapeRedo.push(modifyShape.pop());
+				redoOp.push(undoOp.pop());
+			} else if (modifyShape.peek() == "hexagon") {
+
+				updateHexagonCmd.unexecute();
 
 				modifyShapeRedo.push(modifyShape.pop());
 				redoOp.push(undoOp.pop());
@@ -572,6 +606,12 @@ public class DrawingController {
 			} else if (modifyShapeRedo.peek() == "donut") {
 
 				updateDonutCmd.execute();
+
+				modifyShape.push(modifyShapeRedo.pop());
+				undoOp.push(redoOp.pop());
+			} else if (modifyShapeRedo.peek() == "hexagon") {
+
+				updateHexagonCmd.execute();
 
 				modifyShape.push(modifyShapeRedo.pop());
 				undoOp.push(redoOp.pop());

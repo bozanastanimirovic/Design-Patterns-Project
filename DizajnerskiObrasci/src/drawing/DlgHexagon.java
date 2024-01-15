@@ -330,8 +330,7 @@ public class DlgHexagon extends JDialog {
 	}
 
 	public boolean isOk() {
-		// TODO Auto-generated method stub
-		return false;
+		return ok;
 	}
 
 

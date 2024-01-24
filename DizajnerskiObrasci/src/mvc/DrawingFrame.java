@@ -1,7 +1,9 @@
 package mvc;
 
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
@@ -13,11 +15,20 @@ import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JPanel;
+import java.awt.GridLayout;
+import java.awt.FlowLayout;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import java.awt.GridBagLayout;
+import javax.swing.JList;
 
 public class DrawingFrame extends JFrame {
 
@@ -38,10 +49,17 @@ public class DrawingFrame extends JFrame {
 
 	DrawingView view = new DrawingView();
 	DrawingController controller;
-	private JToolBar toolBar_1;
+	private JToggleButton tglbtnHexagon;
+	private JToolBar toolBar2;
 	private JButton btnUndo;
 	private JButton btnRedo;
-	private JToggleButton tglbtnHexagon;
+	private JScrollPane scrollPane;
+	private JList<String> list;
+	private DefaultListModel<String> listModel;
+	private JButton btnToFront;
+	private JButton btnToBack;
+	private JButton btnBringToFront;
+	private JButton btnBringToBack;
 
 	public DrawingFrame() {
 		view.addMouseListener(new MouseAdapter() {
@@ -52,54 +70,41 @@ public class DrawingFrame extends JFrame {
 		});
 		// getContentPane().add(view, BorderLayout.CENTER);
 
-		setSize(700, 500);
+		//this.setSize(1000, 700);
+		setLocationRelativeTo(null);
 		setVisible(true);
 		setBounds(100, 100, 772, 472);
 
 		setTitle("Stanimirovic Bozana IT 32/2021 ");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+		getContentPane().setLayout(new BorderLayout(0, 0));
 		view.setBackground(Color.WHITE);
 		view.setBorder(new EmptyBorder(5, 5, 5, 5));
-		view.setLayout(new BorderLayout(0, 0));
-		getContentPane().add(view, BorderLayout.CENTER);
 		
-		toolBar_1 = new JToolBar();
-		toolBar_1.setBackground(new Color(255, 182, 193));
-		view.add(toolBar_1, BorderLayout.SOUTH);
-		
-		btnUndo = new JButton("Undo");
-		btnUndo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e){
-				try {
-					controller.undo();
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		btnUndo.setBackground(new Color(255, 255, 255));
-		toolBar_1.add(btnUndo);
-		
-		btnRedo = new JButton("Redo");
-		btnRedo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					controller.redo();
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		btnRedo.setBackground(new Color(255, 255, 255));
-		toolBar_1.add(btnRedo);
+		getContentPane().setPreferredSize(new Dimension(1200, 700));
 
-		toolBar = new JToolBar();
+        pack();
+		
+		JSplitPane splitPane = new JSplitPane();
+		getContentPane().add(splitPane, BorderLayout.CENTER);
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		splitPane.setLeftComponent(scrollPane_2);
+		
+		listModel = new DefaultListModel<>();
+		list = new JList<>(listModel);
+		scrollPane_2.setViewportView(list);
+		
+		splitPane.setRightComponent(view);
+		
+		JToolBar toolBar = new JToolBar();
 		toolBar.setBackground(new Color(255, 182, 193));
 		getContentPane().add(toolBar, BorderLayout.NORTH);
-
+		
+		JToolBar toolBar2 = new JToolBar();
+		toolBar2.setBackground(new Color(255, 182, 193));
+		getContentPane().add(toolBar2, BorderLayout.SOUTH);
+		
 		tglBtnPoint = new JToggleButton("POINT");
 		tglBtnPoint.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		tglBtnPoint.setBackground(new Color(255, 255, 255));
@@ -183,7 +188,7 @@ public class DrawingFrame extends JFrame {
 		toolBar.add(btnDelete);
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (view.getSelected() == null) {
+				if (controller.getSelected() == null) {
 					JOptionPane.showMessageDialog(null, "Select shape!", "Message", JOptionPane.WARNING_MESSAGE);
 					btnSelect.setSelected(true);
 				} else {
@@ -200,7 +205,7 @@ public class DrawingFrame extends JFrame {
 		toolBar.add(btnModify);
 		btnModify.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (view.getSelected() == null) {
+				if (controller.getSelected() == null) {
 					JOptionPane.showMessageDialog(null, "Select what you want to modify!", "Message",
 							JOptionPane.ERROR_MESSAGE);
 					btnSelect.setSelected(true);
@@ -212,8 +217,8 @@ public class DrawingFrame extends JFrame {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					view.getSelected().setSelected(false);
-					view.setSelected(null);
+					controller.getSelected().setSelected(false);
+					controller.setSelected(null);
 					btnSelect.setSelected(false);
 				}
 
@@ -221,7 +226,97 @@ public class DrawingFrame extends JFrame {
 		});
 		btnModify.setFocusPainted(false);
 
+		btnUndo = new JButton("Undo");
+		btnUndo.setEnabled(false);
+		btnUndo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				try {
+					controller.undo();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnUndo.setBackground(new Color(255, 255, 255));
+		toolBar2.add(btnUndo);
+		
+		btnRedo = new JButton("Redo");
+		btnRedo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					controller.redo();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnRedo.setBackground(new Color(255, 255, 255));
+		toolBar2.add(btnRedo);
+		
+		btnToFront = new JButton("To Front");
+		btnToFront.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.toFront();
+			}
+		});
+		toolBar2.add(btnToFront);
+		
+		btnToBack = new JButton("To Back");
+		btnToBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.toBack();
+			}
+		});
+		toolBar2.add(btnToBack);
+		
+		btnBringToFront = new JButton("Bring To Front");
+		btnBringToFront.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.bringToFront();
+			}
+		});
+		toolBar2.add(btnBringToFront);
+		
+		btnBringToBack = new JButton("Bring To Back");
+		btnBringToBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.bringToBack();
+			}
+		});
+		toolBar2.add(btnBringToBack);
+		
 	}
+	
+	/*btnUndo = new JButton("Undo");
+	btnUndo.setEnabled(false);
+	btnUndo.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e){
+			try {
+				controller.undo();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	});
+	btnUndo.setBackground(new Color(255, 255, 255));
+	toolBar_1.add(btnUndo);
+	
+	btnRedo = new JButton("Redo");
+	btnRedo.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			try {
+				controller.redo();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	});
+	btnRedo.setBackground(new Color(255, 255, 255));
+	toolBar_1.add(btnRedo);*/
 
 	public DrawingView getView() {
 		return view;
@@ -342,9 +437,46 @@ public class DrawingFrame extends JFrame {
 	public void setInnerColor(Color innerColor) {
 		this.innerColor = innerColor;
 	}
+	
+
+	public JButton getBtnUndo() {
+		return btnUndo;
+	}
+
+	public void setBtnUndo(JButton btnUndo) {
+		this.btnUndo = btnUndo;
+	}
+
+	public JButton getBtnRedo() {
+		return btnRedo;
+	}
+
+	public void setBtnRedo(JButton btnRedo) {
+		this.btnRedo = btnRedo;
+	}
 
 	public ButtonGroup getButtonGroup() {
 		return buttonGroup;
 	}
 
+	public JList getList() {
+		return list;
+	}
+
+	public void setList(JList list) {
+		this.list = list;
+	}
+
+	public DefaultListModel<String> getListModel() {
+		return listModel;
+	}
+
+	public void setListModel(DefaultListModel<String> listModel) {
+		this.listModel = listModel;
+	}
+
+	
+
+
+	
 }

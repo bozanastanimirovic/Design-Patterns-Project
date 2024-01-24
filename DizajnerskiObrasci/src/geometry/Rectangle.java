@@ -154,7 +154,8 @@ public class Rectangle extends ShapeArea {
 	}
 
 	public String toString() {
-		return "Upper left point: " + upperLeftPoint + ", width= " + width + ", height=" + height;
+		return "Rectangle: Upper left point - " + upperLeftPoint + ", width= " + width + ", height=" + height + ", Border Color: " + 
+				getColor() + ", Inner color: " + getInnerColor();
 	}
 
 }

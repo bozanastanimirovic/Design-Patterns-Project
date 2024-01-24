@@ -127,7 +127,8 @@ public class Line extends Shape {
 	}
 
 	public String toString() {
-		return startPoint + "-->" + endPoint;
+		return "Line: " + startPoint + "--> " + endPoint + ", Border Color: " + 
+				getColor();
 	}
 
 }

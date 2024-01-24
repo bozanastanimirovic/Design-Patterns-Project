@@ -31,12 +31,12 @@ public class DrawingView extends JPanel {
 		}
 	}
 
-	public Shape getSelected() {
+	/*public Shape getSelected() {
 		return selected;
 	}
 
 	public void setSelected(Shape selected) {
 		this.selected = selected;
-	}
+	}*/
 
 }

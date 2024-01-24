@@ -152,7 +152,8 @@ public class Circle extends ShapeArea {
 	}
 
 	public String toString() {
-		return "Center: " + center + ", radius = " + radius;
+		return "Circle: Center -  " + center + ", radius = " + radius + ", Border Color: " + 
+				getColor() + ", Inner color: " + getInnerColor();
 	}
 
 }

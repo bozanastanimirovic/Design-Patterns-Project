@@ -145,7 +145,7 @@ public class Point extends Shape {
 		// return x;
 		// return String.valueOf(x); - jeste tacno ali ne zelimo tako da
 		// zapisemo tacku
-		return "(" + x + "," + y + ")";
+		return "Point: " + x + "," + y + ", Border Color: " + getColor();
 
 	}
 	/*

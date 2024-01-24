@@ -137,5 +137,11 @@ public class HexagonAdapter extends Shape {
 	@Override
 	public void moveBy(int byX, int byY) {
 	}
+	
+	public String toString() {
+		return "Hexagon: Center -  " + hexagon.getX() + ", " + hexagon.getY()+ ", radius = " + hexagon.getR() + ", Border Color: " + 
+				hexagon.getBorderColor() + ", Inner color: " + hexagon.getAreaColor();
+	}
+
 
 }

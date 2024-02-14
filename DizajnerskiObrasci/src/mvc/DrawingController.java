@@ -36,6 +36,8 @@ import geometry.Line;
 import geometry.Point;
 import geometry.Rectangle;
 import geometry.Shape;
+import observer.EnableButton;
+import observer.EnableButtonUpdate;
 
 public class DrawingController {
 
@@ -85,10 +87,16 @@ public class DrawingController {
 
 	DrawingModel model;
 	DrawingFrame frame;
+	
+	EnableButton enable;
+	EnableButtonUpdate enableUpdate;
 
 	public DrawingController(DrawingModel model, DrawingFrame frame) {
 		this.model = model;
 		this.frame = frame;
+		this.enable = new EnableButton();
+		this.enableUpdate = new EnableButtonUpdate(frame, model);
+		enable.addListener(enableUpdate);
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -108,11 +116,13 @@ public class DrawingController {
 						selectedList.add(shape);
 						commands.add("Selected --> " + shape.toString());
 						frame.getListModel().addElement(commands.get(commands.size() - 1));
+						enable.setSelectedShape(selectedList.size());
 					} else {
 						shape.setSelected(false);
 						selectedList.remove(shape);
 						commands.add("Unselected --> " + shape.toString());
 						frame.getListModel().addElement(commands.get(commands.size() - 1));
+						enable.setSelectedShape(selectedList.size());
 					}
 				} else {
 					// shape.setSelected(false);
@@ -253,11 +263,14 @@ public class DrawingController {
 			 * System.out.println(undoOp); System.out.println(shapesUndo.peek());
 			 * System.out.println(model.getShapes());
 			 */
+
+			enable.setAddedShape();
 		}
 
 		if (undoOp.size() > 0) {
 			frame.getBtnUndo().setEnabled(true);
 		}
+		
 		frame.repaint();
 	}
 
@@ -547,17 +560,17 @@ public class DrawingController {
 			redoOp.push(undoOp.pop());
 
 		} else if (undoOp.peek() == "deleteAll") {
-			 Iterator<Shape> it = deletedShapes.iterator();
+			Iterator<Shape> it = deletedShapes.iterator();
 
-			    while (it.hasNext()) {
-			        Shape shape = it.next();
-			        removeShapeCmd = new RemoveShapeCmd(shape, model);
-			        removeShapeCmd.unexecute();
-					commands.add("Undo --> Delete - " + shape.toString());
-					deletedShapesUndo.add(shape);
-					removeShapeCmd.unexecute();
-					redoOp.push(undoOp.pop());
-			    }
+			while (it.hasNext()) {
+				Shape shape = it.next();
+				removeShapeCmd = new RemoveShapeCmd(shape, model);
+				removeShapeCmd.unexecute();
+				commands.add("Undo --> Delete - " + shape.toString());
+				deletedShapesUndo.add(shape);
+				redoOp.push(undoOp.pop());
+			}
+			deletedShapes.clear();
 
 		} else if (undoOp.peek() == "modify") {
 
@@ -670,10 +683,8 @@ public class DrawingController {
 			shapesRedo.add(selected);
 			commands.add("Undo --> To Back - " + selected.toString());
 		}
+		enable.setUndo(undoOp.size());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
-		if (undoOp.size() == 0) {
-			frame.getBtnUndo().setEnabled(false);
-		}
 		frame.repaint();
 	}
 
@@ -698,6 +709,21 @@ public class DrawingController {
 			undoOp.push(redoOp.pop());
 			// shapesUndo.pop();
 			// frame.getView().getModel().getShapes().remove(shapesUndo.pop());
+
+		} else if (redoOp.peek() == "deleteAll") {
+			Iterator<Shape> it = deletedShapesUndo.iterator();
+
+			System.out.println("Prvi" + deletedShapesUndo);
+			while (it.hasNext()) {
+				Shape shape = it.next();
+				removeShapeCmd = new RemoveShapeCmd(shape, model);
+				removeShapeCmd.execute();
+				commands.add("Redo --> Delete - " + shape.toString());
+				deletedShapes.add(shape);
+				redoOp.push(undoOp.pop());
+			}
+			deletedShapesUndo.clear();
+			System.out.println("Drugi" + deletedShapes);
 
 		} else if (redoOp.peek() == "modify") {
 			if (modifyShapeRedo.peek() == "point") {
@@ -800,13 +826,9 @@ public class DrawingController {
 			shapesRedo.add(selected);
 			commands.add("Redo --> To Back - " + selected.toString());
 		}
+		enable.setRedo(redoOp.size());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
 		frame.repaint();
-		if (undoOp.size() == 0) {
-			frame.getBtnUndo().setEnabled(false);
-		} else {
-			frame.getBtnUndo().setEnabled(true);
-		}
 	}
 
 	public void toFront() {

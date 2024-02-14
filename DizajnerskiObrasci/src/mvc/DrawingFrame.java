@@ -6,11 +6,13 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+
 import javax.swing.JPanel;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
@@ -29,6 +33,7 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import java.awt.GridBagLayout;
 import javax.swing.JList;
+import javax.swing.JMenuBar;
 
 public class DrawingFrame extends JFrame {
 
@@ -39,6 +44,8 @@ public class DrawingFrame extends JFrame {
 	private JToggleButton tglBtnCircle;
 	private JToggleButton tglBtnDonut;
 	private JToggleButton btnSelect;
+	private JButton btnDelete;
+	private JButton btnModify;
 	private JToolBar toolBar;
 	private Component verticalStrut_2;
 	private JButton btnBorderColor;
@@ -60,6 +67,9 @@ public class DrawingFrame extends JFrame {
 	private JButton btnToBack;
 	private JButton btnBringToFront;
 	private JButton btnBringToBack;
+	private JMenuBar menuBar;
+	private JButton btnSave;
+	private JSplitPane splitPane_1;
 
 	public DrawingFrame() {
 		view.addMouseListener(new MouseAdapter() {
@@ -81,7 +91,7 @@ public class DrawingFrame extends JFrame {
 		view.setBackground(Color.WHITE);
 		view.setBorder(new EmptyBorder(5, 5, 5, 5));
 		
-		getContentPane().setPreferredSize(new Dimension(1200, 700));
+		getContentPane().setPreferredSize(new Dimension(1200, 600));
 
         pack();
 		
@@ -181,8 +191,9 @@ public class DrawingFrame extends JFrame {
 		toolBar.add(btnSelect);
 		btnSelect.setFocusPainted(false);
 		buttonGroup.add(btnSelect);
+		btnSelect.setEnabled(false);
 
-		JButton btnDelete = new JButton("Delete");
+		btnDelete = new JButton("Delete");
 		btnDelete.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnDelete.setBackground(new Color(255, 255, 255));
 		toolBar.add(btnDelete);
@@ -198,8 +209,9 @@ public class DrawingFrame extends JFrame {
 			}
 		});
 		btnDelete.setFocusPainted(false);
+		btnDelete.setEnabled(false);
 
-		JButton btnModify = new JButton("Modify");
+		btnModify = new JButton("Modify");
 		btnModify.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnModify.setBackground(new Color(255, 255, 255));
 		toolBar.add(btnModify);
@@ -225,6 +237,7 @@ public class DrawingFrame extends JFrame {
 			}
 		});
 		btnModify.setFocusPainted(false);
+		btnModify.setEnabled(false);
 
 		btnUndo = new JButton("Undo");
 		btnUndo.setEnabled(false);
@@ -240,6 +253,7 @@ public class DrawingFrame extends JFrame {
 		});
 		btnUndo.setBackground(new Color(255, 255, 255));
 		toolBar2.add(btnUndo);
+		btnUndo.setEnabled(false);
 		
 		btnRedo = new JButton("Redo");
 		btnRedo.addActionListener(new ActionListener() {
@@ -254,6 +268,7 @@ public class DrawingFrame extends JFrame {
 		});
 		btnRedo.setBackground(new Color(255, 255, 255));
 		toolBar2.add(btnRedo);
+		btnRedo.setEnabled(false);
 		
 		btnToFront = new JButton("To Front");
 		btnToFront.addActionListener(new ActionListener() {
@@ -262,6 +277,7 @@ public class DrawingFrame extends JFrame {
 			}
 		});
 		toolBar2.add(btnToFront);
+		btnToFront.setEnabled(false);
 		
 		btnToBack = new JButton("To Back");
 		btnToBack.addActionListener(new ActionListener() {
@@ -270,6 +286,7 @@ public class DrawingFrame extends JFrame {
 			}
 		});
 		toolBar2.add(btnToBack);
+		btnToBack.setEnabled(false);
 		
 		btnBringToFront = new JButton("Bring To Front");
 		btnBringToFront.addActionListener(new ActionListener() {
@@ -278,6 +295,7 @@ public class DrawingFrame extends JFrame {
 			}
 		});
 		toolBar2.add(btnBringToFront);
+		btnBringToFront.setEnabled(false);
 		
 		btnBringToBack = new JButton("Bring To Back");
 		btnBringToBack.addActionListener(new ActionListener() {
@@ -286,6 +304,17 @@ public class DrawingFrame extends JFrame {
 			}
 		});
 		toolBar2.add(btnBringToBack);
+		btnBringToBack.setEnabled(false);
+		
+		menuBar = new JMenuBar();
+		menuBar.setBackground(new Color(255, 182, 193));
+		setJMenuBar(menuBar);
+		
+		btnSave = new JButton("SAVE");
+		btnSave.setBackground(Color.WHITE);
+		menuBar.add(btnSave);
+		
+		
 		
 	}
 	
@@ -475,8 +504,44 @@ public class DrawingFrame extends JFrame {
 		this.listModel = listModel;
 	}
 
+	public JButton getBtnToFront() {
+		return btnToFront;
+	}
+
+	public void setBtnToFront(JButton btnToFront) {
+		this.btnToFront = btnToFront;
+	}
+
+	public JButton getBtnToBack() {
+		return btnToBack;
+	}
+
+	public void setBtnToBack(JButton btnToBack) {
+		this.btnToBack = btnToBack;
+	}
+
+	public JButton getBtnBringToFront() {
+		return btnBringToFront;
+	}
+
+	public void setBtnBringToFront(JButton btnBringToFront) {
+		this.btnBringToFront = btnBringToFront;
+	}
+
+	public JButton getBtnBringToBack() {
+		return btnBringToBack;
+	}
+
+	public void setBtnBringToBack(JButton btnBringToBack) {
+		this.btnBringToBack = btnBringToBack;
+	}
+
+	public JButton getBtnModify() {
+		return btnModify;
+	}
 	
-
-
+	public JButton getBtnDelete() {
+		return btnDelete;
+	}
 	
 }

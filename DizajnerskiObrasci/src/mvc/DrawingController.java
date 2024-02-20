@@ -1,15 +1,15 @@
 package mvc;
 
-import java.awt.Color;
-import java.awt.Container;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import adapter.HexagonAdapter;
 import command.AddShapeCmd;
@@ -38,6 +38,8 @@ import geometry.Rectangle;
 import geometry.Shape;
 import observer.EnableButton;
 import observer.EnableButtonUpdate;
+import strategy.FileBin;
+import strategy.FileTxt;
 
 public class DrawingController {
 
@@ -54,20 +56,14 @@ public class DrawingController {
 	private Stack<Shape> modifiedShape = new Stack<Shape>();
 	private Stack<Shape> modifiedShapeRedo = new Stack<Shape>();
 
-	private Stack<Shape> bringToBack = new Stack<Shape>();
-	private Stack<Shape> bringToBackRedo = new Stack<Shape>();
-	private Stack<Integer> undoIndex = new Stack<Integer>();
-
-	private Stack<Shape> bringToFront = new Stack<Shape>();
-	private Stack<Shape> bringToFrontRedo = new Stack<Shape>();
-	private Stack<Integer> redoIndex = new Stack<Integer>();
-
 	private Stack<String> undoOp = new Stack<String>();
 	private Stack<String> redoOp = new Stack<String>();
 
 	private ArrayList<Shape> selectedList = new ArrayList<Shape>();
 	private List<Shape> deletedShapes = new ArrayList<>();
 	private List<Shape> deletedShapesUndo = new ArrayList<>();
+	
+	private ArrayList<Shape> openCopy = new ArrayList<Shape>();
 
 	AddShapeCmd addShapeCmd;
 	RemoveShapeCmd removeShapeCmd;
@@ -87,7 +83,7 @@ public class DrawingController {
 
 	DrawingModel model;
 	DrawingFrame frame;
-	
+
 	EnableButton enable;
 	EnableButtonUpdate enableUpdate;
 
@@ -102,11 +98,8 @@ public class DrawingController {
 	public void mouseClicked(MouseEvent e) {
 		Shape newShape = null;
 		if (frame.getBtnSelect().isSelected()) {
-			// selected = null;
 			Iterator<Shape> it = model.getShapes().iterator();
-
 			while (it.hasNext()) {
-
 				Shape shape = it.next();
 				if (shape.contains(e.getX(), e.getY())) {
 					if (!shape.isSelected()) {
@@ -116,60 +109,36 @@ public class DrawingController {
 						selectedList.add(shape);
 						commands.add("Selected --> " + shape.toString());
 						frame.getListModel().addElement(commands.get(commands.size() - 1));
+						enable.setAddedShape(model.getShapes().size());
 						enable.setSelectedShape(selectedList.size());
+						enable.setUndo(undoOp.size());
+						enable.setRedo(undoOp.size());
 					} else {
 						shape.setSelected(false);
 						selectedList.remove(shape);
 						commands.add("Unselected --> " + shape.toString());
 						frame.getListModel().addElement(commands.get(commands.size() - 1));
+						enable.setAddedShape(model.getShapes().size());
 						enable.setSelectedShape(selectedList.size());
+						enable.setUndo(undoOp.size());
+						enable.setRedo(undoOp.size());
 					}
-				} else {
-					// shape.setSelected(false);
 				}
-
 			}
-
+			frame.getBtnSelect().setSelected(false);
 			frame.repaint();
 
 		} else if (frame.getTglBtnPoint().isSelected()) {
-			/*
-			 * DlgPoint dlgPoint = new DlgPoint();
-			 * dlgPoint.getTxtXCoordinate().setText(String.valueOf(e.getX()));
-			 * dlgPoint.getTxtXCoordinate().setEditable(false);
-			 * dlgPoint.getTxtYCoordinate().setText(String.valueOf(e.getY()));
-			 * dlgPoint.getTxtYCoordinate().setEditable(false);
-			 * dlgPoint.getBtnColor().setBackground(frame.getBorderColor());
-			 * dlgPoint.setModal(true); dlgPoint.setVisible(true);
-			 */
 			Point point = new Point(e.getX(), e.getY());
 			point.setColor(frame.getBorderColor());
-			// newShape = new Point(e.getX(), e.getY(), false,
-			// dlgPoint.getBtnColor().getBackground());
 			newShape = point;
 			startPoint = null;
 		} else if (frame.getTglBtnLine().isSelected()) {
-
 			if (startPoint == null) {
 				startPoint = new Point(e.getX(), e.getY());
 			} else {
-				/*
-				 * DlgLine dlgLine = new DlgLine();
-				 * dlgLine.getTxtStartX().setText(String.valueOf(e.getX()));
-				 * dlgLine.getTxtStartX().setEditable(false);
-				 * dlgLine.getTxtStartY().setText(String.valueOf(e.getY()));
-				 * dlgLine.getTxtStartY().setEditable(false);
-				 * dlgLine.getTxtEndX().setText(String.valueOf(e.getX()));
-				 * dlgLine.getTxtEndX().setEditable(false);
-				 * dlgLine.getTxtEndY().setText(String.valueOf(e.getY()));
-				 * dlgLine.getTxtEndY().setEditable(false); dlgLine.setModal(true);
-				 * dlgLine.setVisible(true); newShape = new Line(startPoint, new Point(e.getX(),
-				 * e.getY()), false, dlgLine.getBtnColor().getBackground());
-				 */
 				Line line = new Line(startPoint, new Point(e.getX(), e.getY()));
 				line.setColor(frame.getBorderColor());
-				// newShape = new Point(e.getX(), e.getY(), false,
-				// dlgPoint.getBtnColor().getBackground());
 				newShape = line;
 				startPoint = null;
 			}
@@ -178,10 +147,8 @@ public class DrawingController {
 			upperLeftPoint = new Point(e.getX(), e.getY());
 			dlgRectangle.getBtnBorderColor().setBackground(frame.getBorderColor());
 			dlgRectangle.getBtnInnerColor().setBackground(frame.getInnerColor());
-
 			dlgRectangle.setRectangle(new Rectangle(upperLeftPoint, -1, -1, false,
 					dlgRectangle.getBtnBorderColor().getBackground(), dlgRectangle.getBtnInnerColor().getBackground()));
-
 			dlgRectangle.getTxtXCoordinate().setText(String.valueOf(upperLeftPoint.getX()));
 			dlgRectangle.getTxtXCoordinate().setEditable(false);
 			dlgRectangle.getTxtYCoordinate().setText(String.valueOf(upperLeftPoint.getY()));
@@ -215,7 +182,6 @@ public class DrawingController {
 			dlgDonut.getBtnBorderColor().setBackground(frame.getBorderColor());
 			dlgDonut.getBtnInnerColor().setBackground(frame.getInnerColor());
 			dlgDonut.setDonut(new Donut(center, -1, -1));
-
 			dlgDonut.getTxtXCoordinate().setText(String.valueOf(center.getX()));
 			dlgDonut.getTxtXCoordinate().setEditable(false);
 			dlgDonut.getTxtYCoordinate().setText(String.valueOf(center.getY()));
@@ -233,7 +199,6 @@ public class DrawingController {
 			dlgHexagon.getBtnInnerColor().setBackground(frame.getInnerColor());
 			dlgHexagon.setHexagon(new HexagonAdapter(center, -1, false, dlgHexagon.getBtnBorderColor().getBackground(),
 					dlgHexagon.getBtnInnerColor().getBackground()));
-
 			dlgHexagon.getTxtXCoordinate().setText(String.valueOf(center.getX()));
 			dlgHexagon.getTxtXCoordinate().setEditable(false);
 			dlgHexagon.getTxtYCoordinate().setText(String.valueOf(center.getY()));
@@ -247,30 +212,15 @@ public class DrawingController {
 			startPoint = null;
 		}
 
-		if (newShape != null)
-
-		{
-			System.out.println(newShape);
-			// model.getShapes().add(newShape);
+		if (newShape != null) {
 			shapesUndo.push(newShape);
 			addShapeCmd = new AddShapeCmd(newShape, model);
 			addShapeCmd.execute();
-			// operation = "add";
 			undoOp.push("add");
 			commands.add("Added --> " + newShape.toString());
 			frame.getListModel().addElement(commands.get(commands.size() - 1));
-			/*
-			 * System.out.println(undoOp); System.out.println(shapesUndo.peek());
-			 * System.out.println(model.getShapes());
-			 */
-
-			enable.setAddedShape();
+			enable.setAddedShape(model.getShapes().size());
 		}
-
-		if (undoOp.size() > 0) {
-			frame.getBtnUndo().setEnabled(true);
-		}
-		
 		frame.repaint();
 	}
 
@@ -278,7 +228,6 @@ public class DrawingController {
 		Shape selected = getSelected();
 		if (selected != null) {
 			if (selected instanceof Point) {
-
 				Point point = (Point) selected;
 				DlgPoint dlgPoint = new DlgPoint();
 				dlgPoint.setPoint(point);
@@ -288,35 +237,10 @@ public class DrawingController {
 				dlgPoint.getBtnColor().setBackground(point.getColor());
 				dlgPoint.setVisible(true);
 				if (dlgPoint.isOk()) {
-					/*
-					 * shapesUndo.push(point); updatePointCmd = new UpdatePointCmd(point,
-					 * dlgPoint.getPoint()); updatePointCmd.execute(); undoOp.push("modify");
-					 * System.out.println(undoOp); System.out.println(shapesUndo.peek());
-					 * System.out.println(model.getShapes()); //
-					 * frame.getView().getModel().getShapes().remove(selected); //
-					 * frame.getView().getModel().getShapes().add(dlgPoint.getPoint());
-					 * frame.repaint();
-					 */
-					/*
-					 * shapesUndo.push(point.clone()); modifyList.add(point.clone()); Point newPoint
-					 * = dlgPoint.getPoint(); newShapes.push(newPoint);
-					 * 
-					 * updatePointCmd = new UpdatePointCmd(point, newPoint);
-					 * updatePointCmd.execute(); modified.push(point);
-					 * 
-					 * undoOp.push("modifyPoint");
-					 * 
-					 * System.out.println(undoOp); System.out.println(shapesUndo.peek());
-					 * System.out.println(newShapes.peek()); System.out.println(model.getShapes());
-					 * 
-					 * frame.repaint();
-					 */
-
 					undoOp.add("modify");
 					modifyShape.add("point");
 					modifiedShape.add(selected.clone());
 
-					// oldShape.add(point.clone());
 					Point newPoint = dlgPoint.getPoint();
 
 					modifiedShapeRedo.add(newPoint.clone());
@@ -326,15 +250,8 @@ public class DrawingController {
 					commands.add("Modified --> " + point.toString());
 					frame.getListModel().addElement(commands.get(commands.size() - 1));
 
-					// modifiedShape.add(point);
-					// newShape.add(newPoint);
-					// modifiedShapeRedo.add(newPoint.clone());
-
-					// System.out.println(model.getShapes());
-
 					frame.repaint();
 				}
-				selected.setSelected(false);
 
 			} else if (selected instanceof Line) {
 				Line line = (Line) selected;
@@ -397,7 +314,7 @@ public class DrawingController {
 					frame.repaint();
 				}
 
-			} else if (selected instanceof Circle) {
+			} else if ((selected instanceof Circle) & !(selected instanceof Donut)) {
 				Circle circle = (Circle) selected;
 				DlgCircle dlgCircle = new DlgCircle();
 				dlgCircle.setCircle(circle);
@@ -490,22 +407,24 @@ public class DrawingController {
 				}
 			}
 		}
-
+		selected.setSelected(true);
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
+		enable.setUndo(undoOp.size());
+		enable.setRedo(undoOp.size());
+		frame.repaint();
 	}
 
 	public void delete() {
 		Shape selected = getSelected();
 		if (selected != null) {
 			if (selectedList.size() == 1) {
-
 				int selectedOpt = JOptionPane.showConfirmDialog(null, "Do you want to delete this shape?", "Message",
 						JOptionPane.YES_NO_OPTION);
 				if (selectedOpt == JOptionPane.YES_OPTION) {
-					// frame.getView().getModel().getShapes().remove(selected);
 					removeShapeCmd = new RemoveShapeCmd(selected, model);
 					removeShapeCmd.execute();
 					shapesUndo.push(selected);
-					// operation = "delete";
 					undoOp.push("delete");
 					commands.add("Deleted --> " + selected.toString());
 					frame.getListModel().addElement(commands.get(commands.size() - 1));
@@ -521,7 +440,6 @@ public class DrawingController {
 						removeShapeCmd = new RemoveShapeCmd(shape, model);
 						removeShapeCmd.execute();
 						deletedShapes.add(shape);
-						// model.remove(shape);
 						undoOp.push("deleteAll");
 						commands.add("Deleted --> " + selected.toString());
 						frame.getListModel().addElement(commands.get(commands.size() - 1));
@@ -531,10 +449,11 @@ public class DrawingController {
 		}
 		setSelected(null);
 		frame.getBtnSelect().setSelected(false);
-		frame.getView().repaint();
-		if (undoOp.size() == 0) {
-			frame.getBtnUndo().setEnabled(false);
-		}
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
+		enable.setUndo(undoOp.size());
+		enable.setRedo(undoOp.size());
+		frame.repaint();
 
 	}
 
@@ -574,60 +493,32 @@ public class DrawingController {
 
 		} else if (undoOp.peek() == "modify") {
 
-			// for (int i = 0; i < modifyList.size(); i++) {
 			if (modifyShape.peek() == "point") {
-				/*
-				 * System.out.println(undoOp); System.out.println(undoOp.peek());
-				 */
-
-				// modifiedShapeRedo.push(modifiedShape.peek());
-
-				/*
-				 * System.out.println(modifiedShape.peek());
-				 * System.out.println(oldShape.peek());
-				 */
-				// modifiedShapeRedo.push(modifiedShape.peek().clone());
-
-				// updatePointCmd = new UpdatePointCmd((Point) modifiedShape.pop(), (Point)
-				// oldShape.peek());
 				updatePointCmd.unexecute();
 
 				modifyShapeRedo.push(modifyShape.pop());
-				// oldShapeRedo.push(oldShape.pop());
-				// modifiedShapeRedo.push(modifiedShape.pop());
 				redoOp.push(undoOp.pop());
-
-				/*
-				 * System.out.println(undoOp); System.out.println(modifiedShapeRedo.peek());
-				 * System.out.println(oldShapeRedo.peek());
-				 * System.out.println(model.getShapes()); System.out.println(undoOp.peek());
-				 */
 			} else if (modifyShape.peek() == "line") {
-
 				updateLineCmd.unexecute();
 
 				modifyShapeRedo.push(modifyShape.pop());
 				redoOp.push(undoOp.pop());
 			} else if (modifyShape.peek() == "rectangle") {
-
 				updateRectangleCmd.unexecute();
 
 				modifyShapeRedo.push(modifyShape.pop());
 				redoOp.push(undoOp.pop());
 			} else if (modifyShape.peek() == "circle") {
-
 				updateCircleCmd.unexecute();
 
 				modifyShapeRedo.push(modifyShape.pop());
 				redoOp.push(undoOp.pop());
 			} else if (modifyShape.peek() == "donut") {
-
 				updateDonutCmd.unexecute();
 
 				modifyShapeRedo.push(modifyShape.pop());
 				redoOp.push(undoOp.pop());
 			} else if (modifyShape.peek() == "hexagon") {
-
 				updateHexagonCmd.unexecute();
 
 				modifyShapeRedo.push(modifyShape.pop());
@@ -635,35 +526,18 @@ public class DrawingController {
 			}
 			commands.add("Undo --> Modify - " + modifiedShape.peek().toString());
 		} else if (undoOp.peek() == "bringToBack") {
-			Shape selected = shapesUndo
-					.pop();/*
-							 * int oldIndex = undoIndex.peek(); int index =
-							 * model.getShapes().indexOf(selected); if (index + 1 < model.getShapes().size()
-							 * - 1) { index = oldIndex; } else { index = model.getShapes().size() - 1; }
-							 * 
-							 * model.getShapes().remove(selected); model.getShapes().add(index, selected);
-							 */
+			Shape selected = shapesUndo.pop();
 			bringToBackCmd.unexecute();
 
 			redoOp.add(undoOp.pop());
-			// redoIndex.push(undoIndex.pop());
 			shapesRedo.add(selected);
 			commands.add("Undo --> Bring To Back - " + selected.toString());
-
 		} else if (undoOp.peek() == "bringToFront") {
 			Shape selected = shapesUndo.pop();
-			/*
-			 * int oldIndex = undoIndex.peek(); int index =
-			 * model.getShapes().indexOf(selected); if (index - 1 > 0) { index = oldIndex; }
-			 * else { index = 0; }
-			 * 
-			 * model.getShapes().remove(selected); model.getShapes().add(index, selected);
-			 */
-
+			
 			bringToFrontCmd.unexecute();
 
 			redoOp.add(undoOp.pop());
-			// redoIndex.push(undoIndex.pop());
 			shapesRedo.add(selected);
 			commands.add("Undo --> Bring To Front - " + selected.toString());
 		} else if (undoOp.peek() == "toFront") {
@@ -682,8 +556,16 @@ public class DrawingController {
 			redoOp.add(undoOp.pop());
 			shapesRedo.add(selected);
 			commands.add("Undo --> To Back - " + selected.toString());
-		}
+		}/* else if (undoOp.peek() == "open") {
+			openCopy.addAll(model.getShapes());
+			model.getShapes().clear();
+
+			redoOp.add(undoOp.pop());
+			shapesRedo.add(selected);
+			commands.add("Undo --> Open - " + openCopy.toString());
+		}*/
 		enable.setUndo(undoOp.size());
+		enable.setRedo(redoOp.size());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
 		frame.repaint();
 	}
@@ -698,8 +580,6 @@ public class DrawingController {
 			shapesUndo.push(shapesRedo.pop());
 			addShapeCmd.execute();
 			undoOp.push(redoOp.pop());
-			// shapesUndo.pop();
-			// frame.getView().getModel().getShapes().remove(shapesUndo.pop());
 
 		} else if (redoOp.peek() == "delete") {
 			removeShapeCmd = new RemoveShapeCmd(shapesRedo.peek(), model);
@@ -707,8 +587,6 @@ public class DrawingController {
 			shapesUndo.push(shapesRedo.pop());
 			removeShapeCmd.execute();
 			undoOp.push(redoOp.pop());
-			// shapesUndo.pop();
-			// frame.getView().getModel().getShapes().remove(shapesUndo.pop());
 
 		} else if (redoOp.peek() == "deleteAll") {
 			Iterator<Shape> it = deletedShapesUndo.iterator();
@@ -727,38 +605,11 @@ public class DrawingController {
 
 		} else if (redoOp.peek() == "modify") {
 			if (modifyShapeRedo.peek() == "point") {
-				/*
-				 * updatePointCmd = new UpdatePointCmd((Point) modifyList.get(i), (Point)
-				 * newShapes.peek());
-				 * 
-				 * shapesRedo.push(shapesUndo.pop()); newShapesRedo.push(newShapes.pop());
-				 * modified.peek();
-				 * 
-				 * updatePointCmd.unexecute();
-				 * 
-				 * redoOp.push(undoOp.pop());
-				 */
-				/*
-				 * System.out.println(modifiedShapeRedo.peek());
-				 * System.out.println(oldShapeRedo.peek());
-				 * System.out.println(model.getShapes());
-				 * 
-				 * oldShape.push(oldShapeRedo.peek().clone());
-				 */
-
-				// updatePointCmd = new UpdatePointCmd((Point) oldShapeRedo.pop(), (Point)
-				// modifiedShapeRedo.peek());
 				updatePointCmd.execute();
 
 				modifyShape.push(modifyShapeRedo.pop());
-				// modifiedShape.push(modifiedShapeRedo.pop());
 				undoOp.push(redoOp.pop());
 
-				/*
-				 * System.out.println(modifiedShapeRedo.peek());
-				 * System.out.println(oldShapeRedo.peek());
-				 * System.out.println(model.getShapes());
-				 */
 			} else if (modifyShapeRedo.peek() == "line") {
 
 				updateLineCmd.execute();
@@ -793,8 +644,6 @@ public class DrawingController {
 			commands.add("Redo --> Modify - " + modifiedShapeRedo.peek().toString());
 		} else if (redoOp.peek() == "bringToBack") {
 			Shape selected = shapesRedo.pop();
-			// model.remove(selected);
-			// model.getShapes().add(0, selected);
 			bringToBackCmd.execute();
 
 			undoOp.add(redoOp.pop());
@@ -802,8 +651,6 @@ public class DrawingController {
 			commands.add("Redo --> Bring To Back - " + selected.toString());
 		} else if (redoOp.peek() == "bringToFront") {
 			Shape selected = shapesRedo.pop();
-			// model.remove(selected);
-			// model.add(selected);
 			bringToFrontCmd.execute();
 
 			undoOp.add(redoOp.pop());
@@ -825,7 +672,17 @@ public class DrawingController {
 			undoOp.add(redoOp.pop());
 			shapesRedo.add(selected);
 			commands.add("Redo --> To Back - " + selected.toString());
-		}
+		} /*else if (redoOp.peek() == "open") {
+			for (int i = 0; i < openCopy.size(); i++) {
+	            model.add(openCopy.get(i));
+	            openCopy.remove(i);
+	        }
+
+			undoOp.add(redoOp.pop());
+			shapesRedo.add(selected);
+			commands.add("Redo --> Open - " + model.getShapes().toString());
+		}*/
+		enable.setUndo(undoOp.size());
 		enable.setRedo(redoOp.size());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
 		frame.repaint();
@@ -833,74 +690,61 @@ public class DrawingController {
 
 	public void toFront() {
 		Shape selected = getSelected();
-
-		/*
-		 * int index = model.getShapes().indexOf(selected); int newIndex = 0; if (index
-		 * + 1 < model.getShapes().size() - 1) { newIndex = index + 1; } else { newIndex
-		 * = model.getShapes().size() - 1; }
-		 * 
-		 * if (index != newIndex) { model.getShapes().remove(selected);
-		 * model.getShapes().add(newIndex, selected); }
-		 */
 		toFrontCmd = new ToFrontCmd(model, selected);
 		toFrontCmd.execute();
 		frame.repaint();
 		undoOp.add("toFront");
 		shapesUndo.add(selected);
-		// undoIndex.add(index);
 		commands.add("To Front --> " + selected.toString());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
+		enable.setUndo(undoOp.size());
+		enable.setRedo(redoOp.size());
 	}
 
 	public void toBack() {
 		Shape selected = getSelected();
-
-		/*
-		 * int index = model.getShapes().indexOf(selected); int newIndex = 0; if (index
-		 * - 1 > 0) { newIndex = index - 1; } else { newIndex = 0; }
-		 * 
-		 * if (index != newIndex) { model.getShapes().remove(selected);
-		 * model.getShapes().add(newIndex, selected); frame.getView().repaint(); }
-		 */
 		toBackCmd = new ToBackCmd(model, selected);
 		toBackCmd.execute();
 		frame.repaint();
 		undoOp.add("toBack");
 		shapesUndo.add(selected);
-		// undoIndex.add(index);
 		commands.add("To Back --> " + selected.toString());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
+		enable.setUndo(undoOp.size());
+		enable.setRedo(redoOp.size());
 
 	}
 
 	public void bringToFront() {
 		Shape selected = getSelected();
-		// int index = model.getShapes().indexOf(selected);
 		bringToFrontCmd = new BringToFrontCmd(model, selected);
 		bringToFrontCmd.execute();
-		// model.remove(selected);
-		// model.add(selected);
 		frame.repaint();
 		undoOp.add("bringToFront");
 		shapesUndo.add(selected);
-		// undoIndex.add(index);
 		commands.add("Brought To Front --> " + selected.toString());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
+		enable.setUndo(undoOp.size());
+		enable.setRedo(redoOp.size());
 	}
 
 	public void bringToBack() {
 		Shape selected = getSelected();
-		// int index = model.getShapes().indexOf(selected);
 		bringToBackCmd = new BringToBackCmd(model, selected);
 		bringToBackCmd.execute();
-		// model.remove(selected);
-		// model.getShapes().add(0, selected);
 		frame.repaint();
 		undoOp.add("bringToBack");
 		shapesUndo.add(selected);
-		// undoIndex.add(index);
 		commands.add("Brought To Back --> " + selected.toString());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
+		enable.setUndo(undoOp.size());
+		enable.setRedo(redoOp.size());
 	}
 
 	public Shape getSelected() {
@@ -909,6 +753,78 @@ public class DrawingController {
 
 	public void setSelected(Shape selected) {
 		this.selected = selected;
+	}
+
+	public void save(){
+		File f = new File("D:\\Faks\\Dizajnerski obrasci");
+		JFileChooser fileChooser = new JFileChooser(f);
+		fileChooser.setDialogTitle("Save");
+		
+		FileNameExtensionFilter filterTxt = new FileNameExtensionFilter("Text file (*.txt)", "txt");
+		FileNameExtensionFilter filterBin = new FileNameExtensionFilter("Drawing (*.bin)", "bin");
+		fileChooser.setFileFilter(filterTxt);
+		fileChooser.addChoosableFileFilter(filterBin);
+
+		int opt = fileChooser.showSaveDialog(frame);
+
+		if (opt == JFileChooser.APPROVE_OPTION) {
+			File fileToSave = fileChooser.getSelectedFile();
+
+			if (fileChooser.getFileFilter().equals(filterTxt) && !fileToSave.getName().toLowerCase().endsWith(".txt")) {
+				fileToSave = new File(fileToSave.getAbsolutePath() + ".txt");
+				FileTxt file = new FileTxt(frame, model);
+				file.save(fileToSave.toString());
+			} else if (fileChooser.getFileFilter().equals(filterBin) && !fileToSave.getName().toLowerCase().endsWith(".bin")) {
+				fileToSave = new File(fileToSave.getAbsolutePath() + ".bin");
+				FileBin file = new FileBin(frame, model);
+				file.save(fileToSave.toString());
+			}
+		}
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
+		enable.setUndo(undoOp.size());
+		enable.setRedo(undoOp.size());
+	}
+
+	public void openTxt() {
+		File f = new File("D:\\Faks\\Dizajnerski obrasci");
+		JFileChooser fileChooser = new JFileChooser(f);
+		fileChooser.setDialogTitle("Open");
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Text file (*.txt)", "txt"));
+		
+		int opt = fileChooser.showOpenDialog(fileChooser);
+		
+		if(opt == JFileChooser.APPROVE_OPTION) {
+			File fileToOpen = fileChooser.getSelectedFile();
+
+			FileTxt file = new FileTxt(frame, model);
+			file.open(fileToOpen.toString());
+		}
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
+		enable.setUndo(undoOp.size());
+		enable.setRedo(undoOp.size());
+	}
+
+	public void openBin() {
+		File f = new File("D:\\Faks\\Dizajnerski obrasci");
+		JFileChooser fileChooser = new JFileChooser(f);
+		fileChooser.setDialogTitle("Open");
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Drawing (*.bin)", "bin"));
+		
+		int opt = fileChooser.showOpenDialog(fileChooser);
+		
+		if(opt == JFileChooser.APPROVE_OPTION) {
+			File fileToOpen = fileChooser.getSelectedFile();
+
+			FileBin file = new FileBin(frame, model);
+			file.open(fileToOpen.toString());
+			frame.repaint();
+		}
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
+		enable.setUndo(undoOp.size());
+		enable.setRedo(undoOp.size());
 	}
 
 }

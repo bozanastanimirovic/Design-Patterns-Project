@@ -9,7 +9,7 @@ import geometry.Shape;
 
 public class DrawingView extends JPanel {
 
-	private Shape selected;
+	//private Shape selected;
 
 	// Nije DrawingModel model; kao u ostalim jer model pravi problem ukoliko je
 	// null

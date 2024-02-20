@@ -27,8 +27,8 @@ public class Test {
 
 
 		// Testiranje deep copy kreiranje prototipa
-		Point p3 = new Point(50, 50, Color.BLACK);
-		Point p4 = new Point(60, 60, Color.BLACK);
+		//Point p3 = new Point(50, 50, Color.BLACK);
+		//Point p4 = new Point(60, 60, Color.BLACK);
 
 		/*LineDeep l3 = new LineDeep(p3, p4, Color.BLACK);
 		LineDeep l4 = l3.clone();

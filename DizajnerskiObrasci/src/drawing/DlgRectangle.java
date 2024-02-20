@@ -9,7 +9,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import geometry.Line;
 import geometry.Point;
 import geometry.Rectangle;
 

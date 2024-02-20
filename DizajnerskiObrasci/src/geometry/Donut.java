@@ -8,8 +8,11 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
+import java.io.Serializable;
 
-public class Donut extends Circle {
+public class Donut extends Circle implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	private int innerRadius;
 
 	public Donut() {

@@ -2,8 +2,11 @@ package geometry;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.Serializable;
 
-public class Circle extends ShapeArea {
+public class Circle extends ShapeArea implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	private Point center = new Point();
 	protected int radius;
 

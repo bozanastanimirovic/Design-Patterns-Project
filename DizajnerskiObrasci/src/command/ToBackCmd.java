@@ -8,13 +8,13 @@ public class ToBackCmd implements Command {
 	private Shape selected;
 	private int index;
 	private int newIndex;
-	private int startIndex;
+	//private int startIndex;
 
 	public ToBackCmd(DrawingModel model, Shape selected) {
 		this.model = model;
 		this.selected = selected;
 		this.index = model.getShapes().indexOf(selected);
-		this.startIndex = model.getShapes().indexOf(selected);
+		//this.startIndex = model.getShapes().indexOf(selected);
 	}
 
 	@Override

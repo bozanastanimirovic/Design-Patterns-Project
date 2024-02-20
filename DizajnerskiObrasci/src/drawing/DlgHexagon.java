@@ -23,8 +23,6 @@ import javax.swing.border.EmptyBorder;
 
 import adapter.HexagonAdapter;
 import geometry.Point;
-import geometry.Rectangle;
-import geometry.Shape;
 
 public class DlgHexagon extends JDialog {
 

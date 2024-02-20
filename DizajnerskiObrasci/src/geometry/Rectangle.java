@@ -2,8 +2,11 @@ package geometry;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.Serializable;
 
-public class Rectangle extends ShapeArea {
+public class Rectangle extends ShapeArea implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	private Point upperLeftPoint = new Point();
 	private int width;
 	private int height;

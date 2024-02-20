@@ -1,18 +1,15 @@
 package mvc;
 
-import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -23,17 +20,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 
-import javax.swing.JPanel;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
-import java.awt.GridBagLayout;
 import javax.swing.JList;
 import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 public class DrawingFrame extends JFrame {
 
@@ -57,10 +50,10 @@ public class DrawingFrame extends JFrame {
 	DrawingView view = new DrawingView();
 	DrawingController controller;
 	private JToggleButton tglbtnHexagon;
-	private JToolBar toolBar2;
+	//private JToolBar toolBar2;
 	private JButton btnUndo;
 	private JButton btnRedo;
-	private JScrollPane scrollPane;
+	//private JScrollPane scrollPane;
 	private JList<String> list;
 	private DefaultListModel<String> listModel;
 	private JButton btnToFront;
@@ -68,8 +61,12 @@ public class DrawingFrame extends JFrame {
 	private JButton btnBringToFront;
 	private JButton btnBringToBack;
 	private JMenuBar menuBar;
-	private JButton btnSave;
-	private JSplitPane splitPane_1;
+	//private JSplitPane splitPane_1;
+	private JMenu mnFile;
+	private JMenuItem mntmSave;
+	private JMenu mnOpen;
+	private JMenuItem mntmTxt;
+	private JMenuItem mntmBin;
 
 	public DrawingFrame() {
 		view.addMouseListener(new MouseAdapter() {
@@ -161,6 +158,8 @@ public class DrawingFrame extends JFrame {
 		toolBar.add(verticalStrut);
 
 		btnBorderColor = new JButton("Border color");
+		btnBorderColor.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
+		btnBorderColor.setForeground(Color.white);
 		btnBorderColor.setBackground(borderColor);
 		btnBorderColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -172,6 +171,7 @@ public class DrawingFrame extends JFrame {
 		toolBar.add(btnBorderColor);
 
 		btnInnerColor = new JButton("Inner color");
+		btnInnerColor.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnInnerColor.setBackground(innerColor);
 		btnInnerColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -229,9 +229,6 @@ public class DrawingFrame extends JFrame {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					controller.getSelected().setSelected(false);
-					controller.setSelected(null);
-					btnSelect.setSelected(false);
 				}
 
 			}
@@ -240,6 +237,7 @@ public class DrawingFrame extends JFrame {
 		btnModify.setEnabled(false);
 
 		btnUndo = new JButton("Undo");
+		btnUndo.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnUndo.setEnabled(false);
 		btnUndo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e){
@@ -256,6 +254,7 @@ public class DrawingFrame extends JFrame {
 		btnUndo.setEnabled(false);
 		
 		btnRedo = new JButton("Redo");
+		btnRedo.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnRedo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -271,48 +270,89 @@ public class DrawingFrame extends JFrame {
 		btnRedo.setEnabled(false);
 		
 		btnToFront = new JButton("To Front");
+		btnToFront.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnToFront.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				controller.toFront();
 			}
 		});
 		toolBar2.add(btnToFront);
+		btnToFront.setBackground(new Color(255, 255, 255));
 		btnToFront.setEnabled(false);
 		
 		btnToBack = new JButton("To Back");
+		btnToBack.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnToBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				controller.toBack();
 			}
 		});
 		toolBar2.add(btnToBack);
+		btnToBack.setBackground(new Color(255, 255, 255));
 		btnToBack.setEnabled(false);
 		
 		btnBringToFront = new JButton("Bring To Front");
+		btnBringToFront.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnBringToFront.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				controller.bringToFront();
 			}
 		});
 		toolBar2.add(btnBringToFront);
+		btnBringToFront.setBackground(new Color(255, 255, 255));
 		btnBringToFront.setEnabled(false);
 		
 		btnBringToBack = new JButton("Bring To Back");
+		btnBringToBack.setFont(new Font("Yu Gothic UI Semibold", Font.PLAIN, 13));
 		btnBringToBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				controller.bringToBack();
 			}
 		});
 		toolBar2.add(btnBringToBack);
+		btnBringToBack.setBackground(new Color(255, 255, 255));
 		btnBringToBack.setEnabled(false);
 		
 		menuBar = new JMenuBar();
-		menuBar.setBackground(new Color(255, 182, 193));
+		menuBar.setBackground(Color.white);
 		setJMenuBar(menuBar);
 		
-		btnSave = new JButton("SAVE");
-		btnSave.setBackground(Color.WHITE);
-		menuBar.add(btnSave);
+		mnFile = new JMenu("FILE");
+		mnFile.setBackground(Color.white);
+		//mnFile.setSize();
+		menuBar.add(mnFile);
+		
+		mntmSave = new JMenuItem("Save");
+		mntmSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.save();
+			}
+		});
+		mntmSave.setBackground(Color.white);
+		mnFile.add(mntmSave);
+		
+		mnOpen = new JMenu("Open");
+		mnOpen.setBackground(Color.white);
+		mnFile.add(mnOpen);
+		
+		mntmTxt = new JMenuItem("Open .txt file");
+		mntmTxt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.openTxt();
+			}
+		});
+		mntmTxt.setBackground(Color.white);
+		mnOpen.add(mntmTxt);
+		
+		
+		mntmBin = new JMenuItem("Open .bin file");
+		mntmBin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				controller.openBin();
+			}
+		});
+		mntmBin.setBackground(Color.white);
+		mnOpen.add(mntmBin);
 		
 		
 		
@@ -488,11 +528,11 @@ public class DrawingFrame extends JFrame {
 		return buttonGroup;
 	}
 
-	public JList getList() {
+	public JList<String> getList() {
 		return list;
 	}
 
-	public void setList(JList list) {
+	public void setList(JList<String> list) {
 		this.list = list;
 	}
 

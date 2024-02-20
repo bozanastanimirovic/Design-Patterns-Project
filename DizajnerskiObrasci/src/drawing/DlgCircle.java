@@ -11,7 +11,6 @@ import javax.swing.border.EmptyBorder;
 
 import geometry.Circle;
 import geometry.Point;
-import geometry.Rectangle;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;

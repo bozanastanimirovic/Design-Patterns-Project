@@ -28,7 +28,6 @@ public class TestCommand {
 		Donut d2 = new Donut(p3, 20, 20, Color.RED, Color.WHITE);
 		
 		Shape s1 = p1;
-		Shape s2 = new Line(p1,p2, Color.BLUE);
 		Shape s3 = new Circle(p2, 30, Color.BLACK, Color.WHITE);
 		
 		AddShapeCmd addShapeCmd = new AddShapeCmd(s1, model);

@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import geometry.Point;
-import mvc.DrawingFrame;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;

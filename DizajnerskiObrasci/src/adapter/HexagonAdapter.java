@@ -2,14 +2,15 @@ package adapter;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.Serializable;
 
 import geometry.Point;
-import geometry.Rectangle;
 import hexagon.Hexagon;
 import geometry.Shape;
 
-public class HexagonAdapter extends Shape {
-
+public class HexagonAdapter extends Shape implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	private Hexagon hexagon = new Hexagon(0, 0, 0);
 
 	public HexagonAdapter(Hexagon hexagon) {

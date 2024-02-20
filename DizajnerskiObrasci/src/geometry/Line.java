@@ -2,8 +2,11 @@ package geometry;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.Serializable;
 
-public class Line extends Shape {
+public class Line extends Shape implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	private Point startPoint = new Point();
 	private Point endPoint = new Point();
 	

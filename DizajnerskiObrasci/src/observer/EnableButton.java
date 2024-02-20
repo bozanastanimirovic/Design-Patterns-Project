@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 public class EnableButton {
+	private int shapes;
 	private int selectedShapes;
 	private int undoSize;
 	private int redoSize;
@@ -14,8 +15,8 @@ public class EnableButton {
 		propertyChangeSupport = new PropertyChangeSupport(this);
 	}
 
-	public void setAddedShape() {
-		propertyChangeSupport.firePropertyChange("add", null, null);
+	public void setAddedShape(int shapes) {
+		propertyChangeSupport.firePropertyChange("add", this.shapes, shapes);
 	}
 
 	public void setSelectedShape(int selectedShapes) {

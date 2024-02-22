@@ -8,9 +8,9 @@ import geometry.Point;
 import hexagon.Hexagon;
 import geometry.Shape;
 
-public class HexagonAdapter extends Shape implements Serializable{
+public class HexagonAdapter extends Shape implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private Hexagon hexagon = new Hexagon(0, 0, 0);
 
 	public HexagonAdapter(Hexagon hexagon) {
@@ -52,13 +52,13 @@ public class HexagonAdapter extends Shape implements Serializable{
 		if (isSelected()) {
 			g.setColor(Color.BLUE);
 			g.drawRect(getX() - 2, getY() - 2, 4, 4);
-            g.drawRect(getX() - getR() - 2, getY() - 2, 4, 4);
-            g.drawRect(getX() + getR() - 2, getY() - 2, 4, 4);
-            g.drawRect(getX() - getR() / 2 - 2, getY() - (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
-            g.drawRect(getX() + getR() / 2 - 2, getY() - (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
-            g.drawRect(getX() - getR() / 2 - 2, getY() + (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
-            g.drawRect(getX() + getR() / 2 - 2, getY() + (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
-            g.setColor(Color.BLACK);
+			g.drawRect(getX() - getR() - 2, getY() - 2, 4, 4);
+			g.drawRect(getX() + getR() - 2, getY() - 2, 4, 4);
+			g.drawRect(getX() - getR() / 2 - 2, getY() - (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
+			g.drawRect(getX() + getR() / 2 - 2, getY() - (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
+			g.drawRect(getX() - getR() / 2 - 2, getY() + (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
+			g.drawRect(getX() + getR() / 2 - 2, getY() + (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
+			g.setColor(Color.BLACK);
 		}
 	}
 
@@ -118,7 +118,7 @@ public class HexagonAdapter extends Shape implements Serializable{
 	public void setX(int x) {
 		this.hexagon.setX(x);
 	}
-	
+
 	public int getR() {
 		return hexagon.getR();
 	}
@@ -138,11 +138,10 @@ public class HexagonAdapter extends Shape implements Serializable{
 	@Override
 	public void moveBy(int byX, int byY) {
 	}
-	
-	public String toString() {
-		return "Hexagon: Center -  " + hexagon.getX() + ", " + hexagon.getY()+ ", radius = " + hexagon.getR() + ", Border Color: " + 
-				hexagon.getBorderColor() + ", Inner color: " + hexagon.getAreaColor();
-	}
 
+	public String toString() {
+		return "Hexagon: Center:" + hexagon.getX() + "," + hexagon.getY() + ", radius=" + hexagon.getR()
+				+ ", Border Color:" + hexagon.getBorderColor() + ", Inner color:" + hexagon.getAreaColor();
+	}
 
 }

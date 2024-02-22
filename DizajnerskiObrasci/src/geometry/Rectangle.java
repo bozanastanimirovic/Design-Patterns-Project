@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.Serializable;
 
-public class Rectangle extends ShapeArea implements Serializable{
+public class Rectangle extends ShapeArea implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private Point upperLeftPoint = new Point();
 	private int width;
 	private int height;
@@ -35,7 +35,7 @@ public class Rectangle extends ShapeArea implements Serializable{
 		this(upperLeftPoint, height, width, selected, color);
 		setInnerColor(innerColor);
 	}
-	
+
 	public Rectangle(Point upperLeftPoint, int height, int width, Color color, Color innerColor) {
 		this(upperLeftPoint, height, width);
 		setColor(color);
@@ -90,22 +90,21 @@ public class Rectangle extends ShapeArea implements Serializable{
 			g.setColor(Color.black);
 		}
 	}
-	
+
 	public Rectangle clone() {
 		Rectangle rectangle = new Rectangle();
-		
+
 		rectangle.getUpperLeftPoint().setX(this.getUpperLeftPoint().getX());
 		rectangle.getUpperLeftPoint().setY(this.getUpperLeftPoint().getY());
 
 		rectangle.setHeight(this.getHeight());
 		rectangle.setWidth(this.getWidth());
-		
+
 		rectangle.setColor(this.getColor());
 		rectangle.setInnerColor(this.getInnerColor());
 
 		return rectangle;
 	}
-
 
 	@Override
 	public void moveTo(int x, int y) {
@@ -157,8 +156,8 @@ public class Rectangle extends ShapeArea implements Serializable{
 	}
 
 	public String toString() {
-		return "Rectangle: Upper left point - " + upperLeftPoint + ", width= " + width + ", height=" + height + ", Border Color: " + 
-				getColor() + ", Inner color: " + getInnerColor();
+		return "Rectangle: Upper left point:" + upperLeftPoint.getX() + "," + upperLeftPoint.getY() + ", width=" + width
+				+ ", height=" + height + ", Border Color:" + getColor() + ", Inner color: " + getInnerColor();
 	}
 
 }

@@ -10,16 +10,19 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 import command.RemoveShapeCmd;
+import mvc.DrawingController;
 import mvc.DrawingFrame;
 import mvc.DrawingModel;
 
 public class FileTxt implements FileStrategy {
 	DrawingFrame frame;
 	DrawingModel model;
+	DrawingController controller;
 
-	public FileTxt(DrawingFrame frame, DrawingModel model) {
+	public FileTxt(DrawingFrame frame, DrawingModel model, DrawingController controller) {
 		this.frame = frame;
 		this.model = model;
+		this.controller = controller;
 	}
 
 	@Override
@@ -43,6 +46,7 @@ public class FileTxt implements FileStrategy {
 						JOptionPane.YES_NO_OPTION);
 				if (opt == JOptionPane.YES_OPTION) {
 					((DefaultListModel<String>) frame.getListModel()).addElement(line);
+					controller.drawOpened(line);
 				}
 			}
 		} catch (IOException e) {

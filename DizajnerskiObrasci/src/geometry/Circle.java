@@ -155,7 +155,7 @@ public class Circle extends ShapeArea implements Serializable{
 	}
 
 	public String toString() {
-		return "Circle: Center -  " + center + ", radius = " + radius + ", Border Color: " + 
+		return "Circle: Center:" + center.getX() + ","+ center.getY() + ", radius=" + radius + ", Border Color:" + 
 				getColor() + ", Inner color: " + getInnerColor();
 	}
 

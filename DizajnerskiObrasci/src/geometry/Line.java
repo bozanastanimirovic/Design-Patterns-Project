@@ -4,12 +4,11 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.Serializable;
 
-public class Line extends Shape implements Serializable{
+public class Line extends Shape implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private Point startPoint = new Point();
 	private Point endPoint = new Point();
-	
 
 	public Line() {
 
@@ -29,12 +28,12 @@ public class Line extends Shape implements Serializable{
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
 	}
-	
+
 	public Line(Point startPoint, Point endPoint, boolean selected, Color color) {
 		this(startPoint, endPoint, selected);
 		setColor(color);
 	}
-	
+
 	public Line(Point startPoint, Point endPoint, Color color) {
 		this(startPoint, endPoint);
 		setColor(color);
@@ -76,7 +75,7 @@ public class Line extends Shape implements Serializable{
 			g.setColor(Color.black);
 		}
 	}
-	
+
 	public Line clone() {
 		Line line = new Line();
 
@@ -130,8 +129,8 @@ public class Line extends Shape implements Serializable{
 	}
 
 	public String toString() {
-		return "Line: " + startPoint + "--> " + endPoint + ", Border Color: " + 
-				getColor();
+		return "Line: StartPoint:" + startPoint.getX() + "," + startPoint.getY() + ", EndPoint:" + endPoint.getX()
+				+ "," + endPoint.getY() + ", Border Color: " + getColor();
 	}
 
 }

@@ -147,7 +147,7 @@ public class Point extends Shape implements Serializable{
 		// return x;
 		// return String.valueOf(x); - jeste tacno ali ne zelimo tako da
 		// zapisemo tacku
-		return "Point: " + x + "," + y + ", Border Color: " + getColor();
+		return "Point:" + x + "," + y + ", Border Color:" + this.getColor();
 
 	}
 	/*

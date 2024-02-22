@@ -82,7 +82,7 @@ public class DrawingFrame extends JFrame {
 		setVisible(true);
 		setBounds(100, 100, 772, 472);
 
-		setTitle("Stanimirovic Bozana IT 32/2021 ");
+		setTitle("Stanimirović Božana IT 32/2021 ");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		view.setBackground(Color.WHITE);

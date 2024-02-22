@@ -10,9 +10,9 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.io.Serializable;
 
-public class Donut extends Circle implements Serializable{
+public class Donut extends Circle implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private int innerRadius;
 
 	public Donut() {
@@ -43,7 +43,7 @@ public class Donut extends Circle implements Serializable{
 		this(center, radius, innerRadius, selected, color);
 		setInnerColor(innerColor);
 	}
-	
+
 	public Donut(Point center, int radius, int innerRadius, Color color, Color innerColor) {
 		this(center, radius, innerRadius);
 		setColor(color);
@@ -64,35 +64,35 @@ public class Donut extends Circle implements Serializable{
 	public double area() {
 		return super.area() - innerRadius * innerRadius * Math.PI;
 	}
-	
+
 	public void fill(Graphics g) {
 		Graphics2D g2D = (Graphics2D) g.create();
-		
+
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-		
+
 		Shape outerCircle = new Ellipse2D.Double(getCenter().getX() - getRadius(), getCenter().getY() - getRadius(),
-                2 * getRadius(), 2 * getRadius());
-		
+				2 * getRadius(), 2 * getRadius());
+
 		Shape innerCircle = new Ellipse2D.Double(getCenter().getX() - innerRadius, getCenter().getY() - innerRadius,
-                2 * innerRadius, 2 * innerRadius);
-		
+				2 * innerRadius, 2 * innerRadius);
+
 		Area donutArea = new Area(outerCircle);
 
-	        
-        donutArea.subtract(new Area(innerCircle));
+		donutArea.subtract(new Area(innerCircle));
 
-        g2D.setColor(getInnerColor());
+		g2D.setColor(getInnerColor());
 
-        g2D.fill(donutArea);
+		g2D.fill(donutArea);
 
-        g2D.dispose();
-		
+		g2D.dispose();
+
 		g2D.setColor(getInnerColor());
 		super.fill(g2D);
 		g2D.setColor(Color.white);
-		g2D.fillOval(getCenter().getX() - this.innerRadius, getCenter().getY() - this.innerRadius, this.innerRadius * 2, this.innerRadius * 2);
-		
+		g2D.fillOval(getCenter().getX() - this.innerRadius, getCenter().getY() - this.innerRadius, this.innerRadius * 2,
+				this.innerRadius * 2);
+
 	}
 
 	public void draw(Graphics g) {
@@ -111,10 +111,10 @@ public class Donut extends Circle implements Serializable{
 			g.setColor(Color.black);
 		}
 	}
-	
+
 	public Donut clone() {
 		Donut donut = new Donut();
-		
+
 		donut.getCenter().setX(this.getCenter().getX());
 		donut.getCenter().setY(this.getCenter().getY());
 
@@ -124,9 +124,9 @@ public class Donut extends Circle implements Serializable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		donut.setInnerRadius(this.getInnerRadius());
-		
+
 		donut.setColor(this.getColor());
 		donut.setInnerColor(this.getInnerColor());
 
@@ -143,7 +143,7 @@ public class Donut extends Circle implements Serializable{
 	}
 
 	public boolean contains(int x, int y) {
-		
+
 		return super.contains(x, y) && getCenter().distance(x, y) >= innerRadius;
 	}
 
@@ -161,8 +161,8 @@ public class Donut extends Circle implements Serializable{
 	}
 
 	public String toString() {
-		return "Donut: Center -  " + super.getCenter() + ", radius = " + radius + ", innerRadius = " + innerRadius + ", Border Color: " + 
-				getColor() + ", Inner color: " + getInnerColor();
+		return "Donut: Center:" + super.getCenter().getX() + "," + super.getCenter().getY() + ", radius=" + radius
+				+ ", innerRadius=" + innerRadius + ", Border Color:" + getColor() + ", Inner color:" + getInnerColor();
 	}
 
 }

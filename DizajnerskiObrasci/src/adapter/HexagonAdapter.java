@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.Serializable;
 
+import geometry.Circle;
 import geometry.Point;
 import hexagon.Hexagon;
 import geometry.Shape;
@@ -59,6 +60,19 @@ public class HexagonAdapter extends Shape implements Serializable {
 			g.drawRect(getX() - getR() / 2 - 2, getY() + (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
 			g.drawRect(getX() + getR() / 2 - 2, getY() + (int) (getR() / 2 * Math.sqrt(3)) - 2, 4, 4);
 			g.setColor(Color.BLACK);
+		}
+	}
+	
+	public boolean equals(Object obj) {
+		if (obj instanceof HexagonAdapter) {
+			HexagonAdapter pomocna = (HexagonAdapter) obj;
+			if (this.getX() == pomocna.getX() && this.getY() == pomocna.getY() && this.getR() == pomocna.getR() && 
+					this.getColor().equals(getColor()) && this.getInnerColor().equals(getInnerColor())) {
+				return true;
+			} else
+				return false;
+		} else {
+			return false;	
 		}
 	}
 

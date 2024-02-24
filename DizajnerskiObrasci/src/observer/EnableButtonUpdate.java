@@ -25,6 +25,7 @@ public class EnableButtonUpdate implements PropertyChangeListener {
 		if (evt.getPropertyName().equals("add")) {
 			this.shapes = (int) evt.getNewValue();
 			numOfShapes();
+			frame.getBtnRedo().setEnabled(false);
 		} else if (evt.getPropertyName().equals("select")) {
 			this.selectedShapes = (int) evt.getNewValue();
 			numOfShapes();
@@ -50,9 +51,11 @@ public class EnableButtonUpdate implements PropertyChangeListener {
 	private void numOfShapes() {
 		if (shapes > 0) {
 			frame.getBtnSelect().setEnabled(true);
-			frame.getBtnUndo().setEnabled(true);
-			frame.getBtnRedo().setEnabled(false);
+			//frame.getBtnUndo().setEnabled(true);
 			//frame.getBtnRedo().setEnabled(false);
+			//frame.getBtnRedo().setEnabled(false);
+		} else if (shapes == 0) {
+			allDisabled();
 		}
 	}
 	
@@ -73,13 +76,13 @@ public class EnableButtonUpdate implements PropertyChangeListener {
 	
 	private void getUndoSize() {
 		if (undoSize > 0) {
-			frame.getBtnSelect().setEnabled(true);
+			//frame.getBtnSelect().setEnabled(true);
 			frame.getBtnUndo().setEnabled(true);
 			//frame.getBtnRedo().setEnabled(true);
 			//allDisabled();
 		} 
 		if (undoSize == 0) {
-			frame.getBtnSelect().setEnabled(false);
+			//frame.getBtnSelect().setEnabled(false);
 			frame.getBtnUndo().setEnabled(false);
 			//frame.getBtnRedo().setEnabled(true);
 			//allDisabled();
@@ -88,7 +91,7 @@ public class EnableButtonUpdate implements PropertyChangeListener {
 	
 	private void getRedoSize() {
 		if (redoSize > 0) {
-			frame.getBtnSelect().setEnabled(true);
+			//frame.getBtnSelect().setEnabled(true);
 			//frame.getBtnUndo().setEnabled(true);
 			frame.getBtnRedo().setEnabled(true);
 			//allDisabled();

@@ -224,8 +224,13 @@ public class DrawingController {
 			undoOp.push("add");
 			commands.add("Added-->" + newShape.toString());
 			frame.getListModel().addElement(commands.get(commands.size() - 1));
+
 			enable.setAddedShape(model.getShapes().size());
+			enable.setSelectedShape(selectedList.size());
+			enable.setUndo(undoOp.size());
+			enable.setRedo(redoOp.size());
 		}
+
 		frame.repaint();
 	}
 
@@ -456,11 +461,11 @@ public class DrawingController {
 	}
 
 	public void undo() throws Exception {
-		if (undoOp.size() == 0) {
-			JOptionPane.showMessageDialog(null, "Niste izvrsili nijednu operaciju!", "Message",
-					JOptionPane.ERROR_MESSAGE);
-			frame.getBtnUndo().setEnabled(false);
-		} else if (undoOp.peek().equals("add")) {
+		/*
+		 * if (undoOp.size() == 0) { JOptionPane.showMessageDialog(null,
+		 * "Niste izvrsili nijednu operaciju!", "Message", JOptionPane.ERROR_MESSAGE);
+		 * frame.getBtnUndo().setEnabled(false); } else
+		 */if (undoOp.peek().equals("add")) {
 			if (model.getShapes().size() > 0) {
 				addShapeCmd = new AddShapeCmd(shapesUndo.peek(), model);
 				commands.add("Undo-->Add:" + shapesUndo.peek().toString());
@@ -571,6 +576,8 @@ public class DrawingController {
 			shapesRedo.add(selected);
 			commands.add("Undo-->Unselect:" + selected.toString());
 		}
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
 		enable.setUndo(undoOp.size());
 		enable.setRedo(redoOp.size());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
@@ -578,10 +585,11 @@ public class DrawingController {
 	}
 
 	public void redo() throws Exception {
-		if (redoOp.size() == 0) {
-			JOptionPane.showMessageDialog(null, "Niste izvrsili nijednu operaciju!", "Message",
-					JOptionPane.ERROR_MESSAGE);
-		} else if (redoOp.peek() == "add") {
+		/*
+		 * if (redoOp.size() == 0) { JOptionPane.showMessageDialog(null,
+		 * "Niste izvrsili nijednu operaciju!", "Message", JOptionPane.ERROR_MESSAGE); }
+		 * else
+		 */if (redoOp.peek() == "add") {
 			addShapeCmd = new AddShapeCmd(shapesRedo.peek(), model);
 			commands.add("Redo-->Add:" + shapesRedo.peek().toString());
 			shapesUndo.push(shapesRedo.pop());
@@ -669,7 +677,7 @@ public class DrawingController {
 			toFrontCmd.execute();
 
 			undoOp.add(redoOp.pop());
-			shapesRedo.add(selected);
+			shapesUndo.add(selected);
 			commands.add("Redo-->To Front:" + selected.toString());
 		} else if (redoOp.peek() == "toBack") {
 			Shape selected = shapesRedo.pop();
@@ -677,7 +685,7 @@ public class DrawingController {
 			toBackCmd.execute();
 
 			undoOp.add(redoOp.pop());
-			shapesRedo.add(selected);
+			shapesUndo.add(selected);
 			commands.add("Redo-->To Back:" + selected.toString());
 		} else if (redoOp.peek() == "select") {
 			Shape selected = shapesRedo.pop();
@@ -685,7 +693,7 @@ public class DrawingController {
 			selected.setSelected(true);
 
 			undoOp.add(redoOp.pop());
-			shapesRedo.add(selected);
+			shapesUndo.add(selected);
 			commands.add("Redo-->Select:" + selected.toString());
 		} else if (redoOp.peek() == "unselect") {
 			Shape selected = shapesRedo.pop();
@@ -693,9 +701,11 @@ public class DrawingController {
 			selected.setSelected(false);
 
 			undoOp.add(redoOp.pop());
-			shapesRedo.add(selected);
+			shapesUndo.add(selected);
 			commands.add("Redo-->Unselect:" + selected.toString());
 		}
+		enable.setAddedShape(model.getShapes().size());
+		enable.setSelectedShape(selectedList.size());
 		enable.setUndo(undoOp.size());
 		enable.setRedo(redoOp.size());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
@@ -812,11 +822,21 @@ public class DrawingController {
 		if (opt == JFileChooser.APPROVE_OPTION) {
 			File fileToOpen = fileChooser.getSelectedFile();
 
+			//model.getShapes().clear();
+			//frame.getListModel().clear();
 			FileTxt file = new FileTxt(frame, model, this);
 			file.open(fileToOpen.toString());
 		}
+		//undoOp.clear();
+		//redoOp.clear();
+		//shapesUndo.clear();
+		//shapesRedo.clear();
 		enable.setAddedShape(model.getShapes().size());
 		enable.setSelectedShape(selectedList.size());
+		// enable.setUndo(undoOp.size());
+		// enable.setRedo(undoOp.size());
+		//enable.setUndo(0);
+		//enable.setRedo(0);
 		enable.setUndo(undoOp.size());
 		enable.setRedo(undoOp.size());
 	}
@@ -824,13 +844,13 @@ public class DrawingController {
 	public void drawOpened(String line) {
 		if (line != null) {
 			String[] one = line.split("-->");
-			//System.out.println("one[0]: " + one[0]);
+			System.out.println("one[0]: " + one[0]);
 			if (one[0].equals("Added")) {
 				Shape shape = readShape(one[1]);
-				shapesUndo.push(shape);
 				addShapeCmd = new AddShapeCmd(shape, model);
 				addShapeCmd.execute();
 				undoOp.push("add");
+				shapesUndo.push(shape);
 			} else if (one[0].equals("Deleted")) {
 				Shape shape = readShape(one[1]);
 				removeShapeCmd = new RemoveShapeCmd(shape, model);
@@ -841,7 +861,8 @@ public class DrawingController {
 				String[] modified = one[1].split("~");
 
 				// model.getShapes().indexOf(shape);
-				System.out.println("TEST" + readShape(modified[0]));
+				System.out.println("TEST " + readShape(modified[0]));
+				System.out.println(model.getShapes());
 				if (model.getShapes().contains(readShape(modified[0]))) {
 					Shape shape = model.get(model.getShapes().indexOf(readShape(modified[0])));
 					Shape newShape = readShape(modified[1]);
@@ -894,12 +915,12 @@ public class DrawingController {
 						}
 					} else if (shape instanceof HexagonAdapter) {
 						System.out.println(shape);
+						updateHexagonCmd = new UpdateHexagonCmd((HexagonAdapter) shape, (HexagonAdapter) newShape);
+						updateHexagonCmd.execute();
 						undoOp.add("modify");
 						modifyShape.add("hexagon");
 						modifiedShape.add(shape.clone());
 						modifiedShapeRedo.add(newShape.clone());
-						updateHexagonCmd = new UpdateHexagonCmd((HexagonAdapter) shape, (HexagonAdapter) newShape);
-						updateHexagonCmd.execute();
 					}
 				}
 			} else if (one[0].equals("Undo")) {
@@ -962,7 +983,7 @@ public class DrawingController {
 					undoOp.add("select");
 					shapesUndo.add(shape);
 				} else {
-					System.out.println("Shape not found in the model.");
+					// System.out.println("Shape not found in the model.");
 				}
 			} else if (one[0].equals("Unselected")) {
 
@@ -975,7 +996,7 @@ public class DrawingController {
 					undoOp.add("unselect");
 					shapesUndo.add(shape);
 				} else {
-					System.out.println("Shape not found in the model.");
+					// System.out.println("Shape not found in the model.");
 				}
 			}
 			enable.setAddedShape(model.getShapes().size());
@@ -1061,6 +1082,7 @@ public class DrawingController {
 			hexagon.setR(Integer.parseInt(radius[1]));
 			hexagon.setColor(parseColor(el[3]));
 			hexagon.setInnerColor(parseColor(el[4]));
+			// System.out.println(hexagon.toString());
 			return hexagon;
 		} else {
 			return null;
@@ -1089,6 +1111,8 @@ public class DrawingController {
 		if (opt == JFileChooser.APPROVE_OPTION) {
 			File fileToOpen = fileChooser.getSelectedFile();
 
+			model.getShapes().clear();
+			frame.getListModel().clear();
 			FileBin file = new FileBin(frame, model);
 			file.open(fileToOpen.toString());
 			frame.repaint();

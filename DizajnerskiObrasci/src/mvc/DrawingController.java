@@ -64,7 +64,7 @@ public class DrawingController {
 	private List<Shape> deletedShapes = new ArrayList<>();
 	private List<Shape> deletedShapesUndo = new ArrayList<>();
 
-	private ArrayList<Shape> openCopy = new ArrayList<Shape>();
+	//private ArrayList<Shape> openCopy = new ArrayList<Shape>();
 
 	AddShapeCmd addShapeCmd;
 	RemoveShapeCmd removeShapeCmd;
@@ -115,7 +115,7 @@ public class DrawingController {
 						enable.setAddedShape(model.getShapes().size());
 						enable.setSelectedShape(selectedList.size());
 						enable.setUndo(undoOp.size());
-						enable.setRedo(undoOp.size());
+						enable.setRedo(redoOp.size());
 					} else {
 						shape.setSelected(false);
 						selectedList.remove(shape);
@@ -126,7 +126,7 @@ public class DrawingController {
 						enable.setAddedShape(model.getShapes().size());
 						enable.setSelectedShape(selectedList.size());
 						enable.setUndo(undoOp.size());
-						enable.setRedo(undoOp.size());
+						enable.setRedo(redoOp.size());
 					}
 				}
 			}
@@ -228,7 +228,10 @@ public class DrawingController {
 			enable.setAddedShape(model.getShapes().size());
 			enable.setSelectedShape(selectedList.size());
 			enable.setUndo(undoOp.size());
-			enable.setRedo(redoOp.size());
+			//enable.setRedo(redoOp.size());
+			enable.setRedo(0);
+			redoOp.clear();
+			shapesRedo.clear();
 		}
 
 		frame.repaint();
@@ -375,7 +378,7 @@ public class DrawingController {
 					updateDonutCmd = new UpdateDonutCmd((Donut) selected, newDonut);
 					updateDonutCmd.execute();
 
-					commands.add("Modified --> " + oldDonut.toString() + "~" + newDonut.toString());
+					commands.add("Modified-->" + oldDonut.toString() + "~" + newDonut.toString());
 					frame.getListModel().addElement(commands.get(commands.size() - 1));
 
 					frame.repaint();
@@ -414,7 +417,10 @@ public class DrawingController {
 		enable.setAddedShape(model.getShapes().size());
 		enable.setSelectedShape(selectedList.size());
 		enable.setUndo(undoOp.size());
-		enable.setRedo(undoOp.size());
+		// enable.setRedo(undoOp.size());
+		enable.setRedo(0);
+		redoOp.clear();
+		shapesRedo.clear();
 		frame.repaint();
 	}
 
@@ -455,7 +461,10 @@ public class DrawingController {
 		enable.setAddedShape(model.getShapes().size());
 		enable.setSelectedShape(selectedList.size());
 		enable.setUndo(undoOp.size());
-		enable.setRedo(undoOp.size());
+		//enable.setRedo(undoOp.size());
+		enable.setRedo(0);
+		redoOp.clear();
+		shapesRedo.clear();
 		frame.repaint();
 
 	}
@@ -722,7 +731,10 @@ public class DrawingController {
 		commands.add("ToFront-->" + selected.toString());
 		frame.getListModel().addElement(commands.get(commands.size() - 1));
 		enable.setUndo(undoOp.size());
-		enable.setRedo(redoOp.size());
+		//enable.setRedo(redoOp.size());
+		enable.setRedo(0);
+		redoOp.clear();
+		shapesRedo.clear();
 	}
 
 	public void toBack() {
@@ -737,7 +749,10 @@ public class DrawingController {
 		enable.setAddedShape(model.getShapes().size());
 		enable.setSelectedShape(selectedList.size());
 		enable.setUndo(undoOp.size());
-		enable.setRedo(redoOp.size());
+		//enable.setRedo(redoOp.size());
+		enable.setRedo(0);
+		redoOp.clear();
+		shapesRedo.clear();
 
 	}
 
@@ -753,7 +768,10 @@ public class DrawingController {
 		enable.setAddedShape(model.getShapes().size());
 		enable.setSelectedShape(selectedList.size());
 		enable.setUndo(undoOp.size());
-		enable.setRedo(redoOp.size());
+		//enable.setRedo(redoOp.size());
+		enable.setRedo(0);
+		redoOp.clear();
+		shapesRedo.clear();
 	}
 
 	public void bringToBack() {
@@ -768,7 +786,10 @@ public class DrawingController {
 		enable.setAddedShape(model.getShapes().size());
 		enable.setSelectedShape(selectedList.size());
 		enable.setUndo(undoOp.size());
-		enable.setRedo(redoOp.size());
+		//enable.setRedo(redoOp.size());
+		enable.setRedo(0);
+		redoOp.clear();
+		shapesRedo.clear();
 	}
 
 	public Shape getSelected() {
@@ -822,8 +843,8 @@ public class DrawingController {
 		if (opt == JFileChooser.APPROVE_OPTION) {
 			File fileToOpen = fileChooser.getSelectedFile();
 
-			//model.getShapes().clear();
-			//frame.getListModel().clear();
+			model.getShapes().clear();
+			frame.getListModel().clear();
 			FileTxt file = new FileTxt(frame, model, this);
 			file.open(fileToOpen.toString());
 		}

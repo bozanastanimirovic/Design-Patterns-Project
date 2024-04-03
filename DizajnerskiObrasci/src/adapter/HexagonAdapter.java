@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.io.Serializable;
 
-import geometry.Circle;
 import geometry.Point;
 import hexagon.Hexagon;
 import geometry.Shape;

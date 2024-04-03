@@ -28,6 +28,10 @@ import javax.swing.Box;
 
 public class DlgLine extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField txtStartX;
 	private JTextField txtStartY;

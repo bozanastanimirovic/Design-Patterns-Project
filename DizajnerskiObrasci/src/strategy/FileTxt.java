@@ -9,7 +9,6 @@ import java.io.IOException;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
-import command.RemoveShapeCmd;
 import mvc.DrawingController;
 import mvc.DrawingFrame;
 import mvc.DrawingModel;

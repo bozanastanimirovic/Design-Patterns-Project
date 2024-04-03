@@ -19,7 +19,6 @@ public class ToFrontCmd implements Command{
     
 	@Override
 	public void execute(){
-		// Greska jer prebacuje kod redo na prvo mjesto
 		index = model.getShapes().indexOf(selected);
 		if (index + 1 < model.getShapes().size() - 1) {
 			newIndex = index + 1;

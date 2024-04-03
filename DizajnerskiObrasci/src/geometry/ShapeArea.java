@@ -5,6 +5,10 @@ import java.awt.Graphics;
 
 public abstract class ShapeArea extends Shape {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Color innerColor;
 	
 	public abstract double area();

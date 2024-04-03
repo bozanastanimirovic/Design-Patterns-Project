@@ -8,8 +8,6 @@ public class RemoveShapeCmd implements Command {
 	private Shape shape;
 	private DrawingModel model;
 	
-	
-	
 	public RemoveShapeCmd(Shape shape, DrawingModel model) {
 		this.shape = shape;
 		this.model = model;

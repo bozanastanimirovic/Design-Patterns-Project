@@ -11,6 +11,10 @@ public class DrawingView extends JPanel {
 
 	//private Shape selected;
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	// Nije DrawingModel model; kao u ostalim jer model pravi problem ukoliko je
 	// null
 	DrawingModel model = new DrawingModel();

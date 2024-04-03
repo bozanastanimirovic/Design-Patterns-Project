@@ -1,16 +1,11 @@
 package strategy;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JOptionPane;
 
 import geometry.Shape;
 import mvc.DrawingFrame;
@@ -35,6 +30,7 @@ public class FileBin implements FileStrategy{
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void open(String file) {
 		try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(file))) {

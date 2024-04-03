@@ -98,7 +98,7 @@ public class DrawingController {
 		this.model = model;
 		this.frame = frame;
 		this.enable = new EnableButton();
-		this.enableUpdate = new EnableButtonUpdate(frame, model);
+		this.enableUpdate = new EnableButtonUpdate(frame, model, this);
 		enable.addListener(enableUpdate);
 	}
 
@@ -470,7 +470,7 @@ public class DrawingController {
 				}
 			}
 		}
-		setSelected(null);
+		//setSelected(null);
 		frame.getBtnSelect().setSelected(false);
 		enable.setAddedShape(model.getShapes().size());
 		enable.setSelectedShape(selectedList.size());
@@ -752,6 +752,7 @@ public class DrawingController {
 			commands.add("Redo-->To Back:" + selected.toString());
 			frame.getListModel().addElement(commands.get(commands.size() - 1));
 		} else if (redoOp.peek() == "select") {
+			System.out.println(shapesRedo);
 			Shape selected = shapesRedo.pop();
 
 			selected.setSelected(true);
@@ -775,7 +776,11 @@ public class DrawingController {
 		enable.setAddedShape(model.getShapes().size());
 		enable.setSelectedShape(selectedList.size());
 		enable.setUndo(undoOp.size());
-		enable.setRedo(redoOp.size());
+		if(shapesRedo.size()==0) {
+			enable.setRedo(0);
+		} else {
+			enable.setRedo(redoOp.size());
+		}
 		frame.repaint();
 	}
 
@@ -935,6 +940,7 @@ public class DrawingController {
 				removeShapeCmd = new RemoveShapeCmd(shape, model);
 				removeShapeCmd.execute();
 				shapesUndo.push(shape);
+				//shape.setSelected(true);
 				undoOp.push("delete");
 			} else if (one[0].equals("Modified")) {
 				String[] modified = one[1].split("~");

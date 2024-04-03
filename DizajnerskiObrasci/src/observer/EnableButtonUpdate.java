@@ -3,11 +3,14 @@ package observer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import mvc.DrawingController;
 import mvc.DrawingFrame;
 import mvc.DrawingModel;
 
 public class EnableButtonUpdate implements PropertyChangeListener {
 	private DrawingFrame frame;
+	private DrawingController controller;
+	private DrawingModel model;
 	//private DrawingModel model;
 
 	private int shapes;
@@ -15,9 +18,10 @@ public class EnableButtonUpdate implements PropertyChangeListener {
 	private int undoSize;
 	private int redoSize;
 
-	public EnableButtonUpdate(DrawingFrame frame, DrawingModel model) {
+	public EnableButtonUpdate(DrawingFrame frame, DrawingModel model, DrawingController controller) {
 		this.frame = frame;
-		//this.model = model;
+		this.controller = controller;
+		this.model = model;
 	}
 
 	@Override
@@ -61,7 +65,32 @@ public class EnableButtonUpdate implements PropertyChangeListener {
 	
 	private void numOfSelectedShapes() {
 		if (selectedShapes == 1) {
-			allEnabled();
+			int index = model.getShapes().indexOf(controller.getSelected());
+			if (shapes == 1) {
+				frame.getBtnModify().setEnabled(true);
+				frame.getBtnDelete().setEnabled(true);
+				frame.getBtnBringToFront().setEnabled(false);
+				frame.getBtnToFront().setEnabled(false);
+				frame.getBtnBringToBack().setEnabled(false);
+				frame.getBtnToBack().setEnabled(false);
+				
+			} else if (index == 0) {
+				frame.getBtnModify().setEnabled(true);
+				frame.getBtnDelete().setEnabled(true);
+				frame.getBtnBringToBack().setEnabled(false);
+				frame.getBtnToBack().setEnabled(false);
+				frame.getBtnBringToFront().setEnabled(true);
+				frame.getBtnToFront().setEnabled(true);
+			} else if (index == model.getShapes().size() - 1) {
+				frame.getBtnModify().setEnabled(true);
+				frame.getBtnDelete().setEnabled(true);
+				frame.getBtnBringToFront().setEnabled(false);
+				frame.getBtnToFront().setEnabled(false);
+				frame.getBtnBringToBack().setEnabled(true);
+				frame.getBtnToBack().setEnabled(true);
+			}else {
+				allEnabled();
+			}
 		} else if (selectedShapes > 1) {
 			frame.getBtnModify().setEnabled(false);
 			frame.getBtnDelete().setEnabled(true);
